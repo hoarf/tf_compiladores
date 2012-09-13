@@ -514,7 +514,7 @@ char *yytext;
 #line 1 "scanner.l"
 #line 2 "scanner.l"
 	#include "tokens.h"
-	#include "main.h"
+	int running;
 #line 519 "lex.yy.c"
 
 #define INITIAL 0
@@ -1930,5 +1930,12 @@ int yywrap(void) {
 	return 1;
 }
 
+int main(int argc, char **argv) {
+	int r = running;
+	int token;
+	token = yylex();
+	printf("%d",token);
+
+}
 
 

@@ -8,14 +8,5 @@
 #include <stdio.h>
 #include "tokens.h"
 #include "m_hash.h"
-#include "main.h"
-
-int main(int argc, char **argv) {
-int r = running;
-	int token;
-	token = yylex();
-	printf("%d",token);
-
-}
 
 

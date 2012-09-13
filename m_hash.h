@@ -12,10 +12,12 @@
 struct _Hash_Node;
 typedef struct _Hash_Node HASH_NODE;
 
+int getAddress(char* name);
 
-int getAddress();
+HASH_NODE* getItem(int address);
 
-int getItem(int code);
+HASH_NODE* putItem(int address, HASH_NODE* item);
 
+void printTable();
 
 #endif /* HASH_H_ */

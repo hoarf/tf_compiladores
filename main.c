@@ -9,9 +9,27 @@ int main(int argc, char **argv) {
 		while(running) {
 			token = yylex();
 			if ( running) {
+			
+				switch(token) {
+					case TK_IDENTIFIER:
+					insertNode(yytext, token);
+					break;
+					case LIT_INTEGER:
+					insertNode(yytext, token);
+					break;
+					case KW_INT:
+					break;
+					case LIT_CHAR:
+					insertNode(yytext, token);
+					break;
+					case LIT_STRING:
+					insertNode(yytext, token);
+					break;
+					case LIT_FLOA:
+					insertNode(yytext, token);
+					break;
+				}
 
-
-				//*switch
 
 			}
 

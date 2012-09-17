@@ -11,8 +11,20 @@ int main(int argc, char **argv) {
 		while(running) {
 			token = yylex();
 			if ( running) {
-
-				//*switch
+			
+				switch(token) {
+					case TK_IDENTIFIER:
+					printf("KW_INT");
+					break;
+					case LIT_INTEGER:
+					break;
+					case KW_INT:
+					break;
+					case LIT_CHAR:
+					break;
+					case LIT_FLOA:
+					break;
+				}
 
 			}
 

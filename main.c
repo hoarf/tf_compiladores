@@ -2,40 +2,32 @@
 
 /* uso: ./etapa1 nome_do_arquivo */
 int main(int argc, char **argv) {
-
-	if (argc < 2) {
+	printf("Compiling %s...",argv[1]);
+	if (argc >= 2) {
 		int token;
 		initMe();
-		yyin= fopen(argv[1],"r");
-
+	    yyin= fopen(argv[1],"r");
 		while(running) {
 			token = yylex();
 			if ( running) {
-			
-				switch(token) {
+					switch(token) {
 					case TK_IDENTIFIER:
-					insertNode(yytext, token);
+						printf("Linha: %i Identificador: %s\n",getLineNumber(),yytext);
 					break;
 					case LIT_INTEGER:
-					insertNode(yytext, token);
-					break;
-					case KW_INT:
+						printf("Linha: %i Inteiro: %i\n",getLineNumber(),atoi(yytext));
 					break;
 					case LIT_CHAR:
-					insertNode(yytext, token);
+						printf("Linha: %i CHAR: %c\n",getLineNumber(),yytext[0]);
 					break;
 					case LIT_STRING:
-					insertNode(yytext, token);
+						printf("Linha: %i STRING: %s\n",getLineNumber(),yytext);
 					break;
-					case LIT_FLOA:
-					insertNode(yytext, token);
-					break;
-				}
-
+					}
 			}
-
 		}
-
 		print();
 	}
+	printf("","Done.");
+	exit(1);
 }

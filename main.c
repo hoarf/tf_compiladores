@@ -1,12 +1,23 @@
-/*
- * Main.c
- *
- *  Created on: Sep 7, 2012
- *      Author: alan
- */
+#include "main.h"
 
-#include <stdio.h>
-#include "tokens.h"
-#include "m_hash.h"
+/* uso: ./etapa1 nome_do_arquivo */
+int main(int argc, char **argv) {
+	int token;
+	initMe();
+	token = yylex();
+	if (argc < 2) {
+		yyin= fopen(argv[1],"r");
 
+		while(running) {
+			token = yylex();
+			if ( running) {
 
+				//*switch
+
+			}
+
+		}
+
+		print();
+	}
+}

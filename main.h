@@ -1,13 +1,12 @@
-/*
- * main.h
- *
- *  Created on: Sep 11, 2012
- *      Author: alan
- */
-
 #ifndef MAIN_H_
 #define MAIN_H_
 
-int running = 1;
+#include "scanner.h"
+#include "m_hash.h"
+#include <stdio.h>
+#include "tokens.h"
+#include <stdlib.h>
+
+void initMe(void) { init(); }
 
 #endif /* MAIN_H_ */

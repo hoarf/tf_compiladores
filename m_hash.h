@@ -1,23 +1,28 @@
-/*
- * hash.h
- *
- *  Created on: Sep 7, 2012
- *      Author: alan
- */
-#ifndef HASH_H_
-#define HASH_H_
+#ifndef M_HASH_H_
+#define M_HASH_H_
 
-#define HASH_SIZE	977
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-struct _Hash_Node;
+#define HASH_SIZE 977
+
 typedef struct _Hash_Node HASH_NODE;
 
-int getAddress(char* name);
+struct _Hash_Node {
+	char * value;
+	int type;
+	HASH_NODE * next;
+};
 
-HASH_NODE* getItem(int address);
+int getAddress(const char* value);
 
-HASH_NODE* putItem(int address, HASH_NODE* item);
+HASH_NODE* tabela[HASH_SIZE];
 
-void printTable();
+void insertNode(const char* value, int type);
 
-#endif /* HASH_H_ */
+void print(void);
+
+void init(void);
+
+#endif /* M_HASH_H_ */

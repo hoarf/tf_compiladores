@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 			
 				switch(token) {
 					case TK_IDENTIFIER:
-					printf("KW_INT");
+					printf("TK_IDENTIFIER");
 					break;
 					case LIT_INTEGER:
 					break;

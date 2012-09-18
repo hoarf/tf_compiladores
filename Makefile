@@ -11,4 +11,4 @@ m_hash.o: m_hash.c
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 clean:
-	rm *.o lex.yy.c etapa1
+	rm *.o lex.yy.c etapa1 lex.yy.h

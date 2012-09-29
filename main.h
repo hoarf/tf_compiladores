@@ -8,6 +8,6 @@
 #include "tokens.h"
 #include <stdlib.h>
 
-void initMe(void) { init(); }
+void initMe(void);
 
 #endif /* MAIN_H_ */

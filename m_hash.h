@@ -23,6 +23,6 @@ void insertNode(const char* value, int type);
 
 void print(void);
 
-void init(void);
+void initMe(void);
 
 #endif /* M_HASH_H_ */

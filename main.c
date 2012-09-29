@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 						printf("Linha: %i FLOAT: %2.2f\n",getLineNumber(),atof(yytext));
 						break;
 					default:
-						printf("Linha: %i ASCII: %c\n",getLineNumber(),yytext[0]);
+						printf("Linha: %i Outro: %s\n",getLineNumber(),(char*) yytext);
 						break;
 					}
 			}

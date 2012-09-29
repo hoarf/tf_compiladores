@@ -23,7 +23,7 @@ void insertNode(const char* value, int type) {
 }
 
 
-void init(void) {
+void initMe(void) {
 	int i;
 	for (i = 0; i < HASH_SIZE; ++i) {
 		tabela[i] = NULL;

@@ -2,7 +2,7 @@
 #ifndef SCANNER_H_
 #define SCANNER_H_
 
-int running;
+
 int lineNumber;
 int getLineNumber(void);
 

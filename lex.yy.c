@@ -527,8 +527,8 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "scanner.l"
 #line 2 "scanner.l"
-	#include "tokens.h"
 	#include "m_hash.h"
+	#include "y.tab.h"
 	#include "scanner.h"
 
 #line 535 "lex.yy.c"
@@ -908,27 +908,27 @@ YY_RULE_SETUP
 case 21:
 YY_RULE_SETUP
 #line 34 "scanner.l"
-{ trimQuotes(yytext) ; insertNode(yytext,LIT_STRING) ; return LIT_STRING; }
+{ trimQuotes(yytext) ; insertNode(yytext,SYMBOL_LIT_STRING) ; return LIT_STRING; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 35 "scanner.l"
-{ insertNode(yytext,TK_IDENTIFIER) ; return TK_IDENTIFIER; }
+{ insertNode(yytext,SYMBOL_IDENTIFIER) ; return TK_IDENTIFIER; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 36 "scanner.l"
-{ insertNode(yytext,LIT_FLOA) ; return LIT_FLOA; }
+{ insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 37 "scanner.l"
-{ insertNode(yytext,LIT_INTEGER) ; return LIT_INTEGER; }
+{ insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 38 "scanner.l"
-{ char valorChar = yytext[1] ; insertNode(&valorChar,LIT_CHAR) ; return LIT_CHAR; }
+{ char valorChar = yytext[1] ; insertNode(&valorChar,SYMBOL_LIT_CHAR) ; return LIT_CHAR; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
@@ -1985,13 +1985,11 @@ void yyfree (void * ptr )
 
 
 
-int running = 1;
 int lineNumber = 1;
 int getLineNumber(void) { return lineNumber; }
 
 
 int yywrap(void) {
-	running = 0;
 	return 1;
 }
 

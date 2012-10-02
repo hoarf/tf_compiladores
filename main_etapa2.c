@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 #endif
 	    yyparse();
 	    printf("%s","Success! \n");
-	    exit(3);
+	    exit(0);
 
 	}
 }

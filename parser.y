@@ -36,66 +36,68 @@
 
 %token TOKEN_ERROR
 
+%left OPERATOR_LE , OPERATOR_GE , OPERATOR_EQ , OPERATOR_NE , OPERATOR_AND, OPERATOR_OR
+%left '-' , '+'
+%left '*' , '/'
+
 
 %%
 
 program:					
-							lista_declaracoes funcoes | funcoes | lista_declaracoes
+							lista_declaracoes_globais funcoes 
+							| funcoes 
+							| lista_declaracoes_globais
 							;
-lista_declaracoes:			
-							lista_declaracoes declaracao_global
+lista_declaracoes_globais:			
+							lista_declaracoes_globais declaracao_global
 							| declaracao_global
 							;	
-array_opcional:				
-							| '[' LIT_INTEGER ']'
-							;
+
 declaracao_global:
-							declaracao_variavel array_opcional ';'	
-							;		
-declaracao_variavel:		
-							TK_IDENTIFIER ':' tipo 
+							TK_IDENTIFIER ':' tipo ';'
+							| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' 
 							;		
 tipo:						
 							KW_INT
 							| KW_FLOAT
 							| KW_CHAR
 							| KW_BOOL
-							;		
-funcoes:		 			
+							;
+	
+funcoes:	 			
 							funcoes funcao
 							| funcao
 							;	
 funcao: 					
-							cabecalho declaracoes_opcional
+							cabecalho lista_declaracoes bloco_de_comandos 
+							| cabecalho bloco_de_comandos  
 							;
-declaracoes_opcional:
-							lista_declaracoes bloco_de_comandos
-							| bloco_de_comandos
-							;	
 cabecalho:					
-							declaracao_variavel '(' lista_de_parametros ')'
+							TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')'
+							| TK_IDENTIFIER ':' tipo '('  ')'
 							;
-lista_de_parametros: 		
-							| parametros							
-							;
-parametros:					
-							parametros ',' declaracao_variavel
-							| declaracao_variavel
+lista_de_parametros:					
+							lista_de_parametros ',' TK_IDENTIFIER ':' tipo
+							| TK_IDENTIFIER ':' tipo
 							;
 lista_declaracoes: 		
-							lista_declaracoes declaracao_variavel ';'
-							| declaracao_variavel ';'
+							lista_declaracoes TK_IDENTIFIER ':' tipo ';'
+							| TK_IDENTIFIER ':' tipo ';'
 							;
 
-bloco_de_comandos:			
-							'{' comandos '}' 
+bloco_de_comandos:		
+							'{' comandos '}'
+							| '{' '}' 
 							| comando
 							;
 comandos:					
-							comandos ; comando
+							comandos ';' comando
 							| comando
 							;
 comando:					
+							output
+							| controle_fluxo ;
+/*
 							bloco_de_comandos
 							| atribuicao 
 							| controle_fluxo 
@@ -103,7 +105,7 @@ comando:
 							| output
 							| return
 							|					
-							;
+							;*/
 atribuicao:					
 							TK_IDENTIFIER '=' expressao
 							| TK_IDENTIFIER '[' expressao ']' '=' expressao
@@ -128,23 +130,18 @@ elemento:
 expressao:					
 							expressao operador expressao
 							| '(' expressao ')' 
-							| TK_IDENTIFIER expressao_opcional
+							| TK_IDENTIFIER 
+							| TK_IDENTIFIER '[' expressao ']'
 							| LIT_INTEGER
 							| LIT_FLOA  
 							;
-							
-expressao_opcional:
-							| '[' expressao ']'
-							;
+
 controle_fluxo:				
-							KW_IF '('expressao')' KW_THEN else_opcional
-							| KW_WHILE '('expressao')' comando
+							KW_IF '(' expressao ')' KW_THEN bloco_de_comandos
+							| KW_IF '(' expressao ')' KW_THEN bloco_de_comandos KW_ELSE bloco_de_comandos							
+							| KW_WHILE '(' expressao ')' bloco_de_comandos
 							;
-else_opcional:				
-							KW_ELSE comando
-							| comando
-							;							
-							
+
 operador:				 	
 							OPERATOR_LE
 							| OPERATOR_GE
@@ -152,6 +149,10 @@ operador:
 							| OPERATOR_NE
 							| OPERATOR_AND
 							| OPERATOR_OR
+							| '+'
+							| '-'
+							| '/'
+							| '*'
 							;
 							
 							
@@ -159,5 +160,5 @@ operador:
 
 int yyerror(char* s) {
 	fprintf(stdout, "%s na linha %i\n", s,getLineNumber());
-	exit(0);
+	exit(3);
 }

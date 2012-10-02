@@ -36,9 +36,9 @@
 
 %token TOKEN_ERROR
 
-%left OPERATOR_LE , OPERATOR_GE , OPERATOR_EQ , OPERATOR_NE , OPERATOR_AND, OPERATOR_OR
-%left '-' , '+'
-%left '*' , '/'
+%left OPERATOR_LE  OPERATOR_GE  OPERATOR_EQ  OPERATOR_NE  OPERATOR_AND OPERATOR_OR '<' '>'
+%left '-'  '+'
+%left '*'  '/'
 
 
 %%
@@ -88,24 +88,20 @@ lista_declaracoes:
 bloco_de_comandos:		
 							'{' comandos '}'
 							| '{' '}' 
-							| comando
 							;
 comandos:					
 							comandos ';' comando
 							| comando
+							| ';'
 							;
 comando:					
-							output
-							| controle_fluxo ;
-/*
 							bloco_de_comandos
-							| atribuicao 
-							| controle_fluxo 
+							| controle_fluxo							
+							| atribuicao
 							| input
 							| output
-							| return
-							|					
-							;*/
+							| return		
+							; 
 atribuicao:					
 							TK_IDENTIFIER '=' expressao
 							| TK_IDENTIFIER '[' expressao ']' '=' expressao
@@ -128,32 +124,32 @@ elemento:
 							LIT_STRING | expressao
 							;
 expressao:					
-							expressao operador expressao
+							expressao '+' expressao
+							| expressao OPERATOR_LE expressao
+							| expressao OPERATOR_GE expressao
+							| expressao OPERATOR_EQ expressao
+							| expressao OPERATOR_NE expressao
+							| expressao OPERATOR_AND expressao
+							| expressao OPERATOR_OR expressao
+							| expressao '-' expressao
+							| expressao '/' expressao
+							| expressao '*' expressao
+							| expressao '<' expressao
+							| expressao '>' expressao
 							| '(' expressao ')' 
+							| LIT_INTEGER
 							| TK_IDENTIFIER 
 							| TK_IDENTIFIER '[' expressao ']'
-							| LIT_INTEGER
 							| LIT_FLOA  
 							;
 
 controle_fluxo:				
 							KW_IF '(' expressao ')' KW_THEN bloco_de_comandos
 							| KW_IF '(' expressao ')' KW_THEN bloco_de_comandos KW_ELSE bloco_de_comandos							
-							| KW_WHILE '(' expressao ')' bloco_de_comandos
+							| KW_WHILE '(' expressao ')'  bloco_de_comandos
 							;
 
-operador:				 	
-							OPERATOR_LE
-							| OPERATOR_GE
-							| OPERATOR_EQ
-							| OPERATOR_NE
-							| OPERATOR_AND
-							| OPERATOR_OR
-							| '+'
-							| '-'
-							| '/'
-							| '*'
-							;
+
 							
 							
 %%

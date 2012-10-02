@@ -33,8 +33,8 @@ true 				{ return LIT_TRUE; }
 
 \".*\" 				{ trimQuotes(yytext) ; insertNode(yytext,SYMBOL_LIT_STRING) ; return LIT_STRING; }
 [a-zA-Z][_a-zA-Z0-9]* 	{ insertNode(yytext,SYMBOL_IDENTIFIER) ; return TK_IDENTIFIER; }
-[+-]?[0-9]*"."[0-9]+ { insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
-[+-]?[0-9]+ 		{ insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
+[-]?[0-9]*"."[0-9]+ { insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
+[-]?[0-9]+ 		{ insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
 "'"[a-zA-Z]"'" 		{ char valorChar = yytext[1] ; insertNode(&valorChar,SYMBOL_LIT_CHAR) ; return LIT_CHAR; }
 
 [ \t]				{}

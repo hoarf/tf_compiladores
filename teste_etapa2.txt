@@ -1,9 +1,5 @@
 // UFRGS - Compiladores - Marcelo Johann - 2012/2
 
-a: int;
-v: int [10];
-
-
 main: int (a: int , b: int) 
   i: int;
   {
@@ -14,9 +10,14 @@ main: int (a: int , b: int)
     };
 	output "Incrementado algumas vezes fica ",a,"\n"
   }
+a: int;
+v: int [10];
+
+
+
 
 incn: int (x:int, n:int)
-   { return i+10 }  
+   { if (a) then return i+10; }  
   
 outra: int () {}
 

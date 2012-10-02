@@ -88,8 +88,11 @@ lista_declaracoes:
 bloco_de_comandos:		
 							'{' comandos '}'  
 							;
-comandos:					
-							comando ';' comandos
+comandos:
+							| lista_comandos
+							; 
+lista_comandos:					
+							comando ';' lista_comandos
 							| comando
 							;
 comando_vazio:				
@@ -109,6 +112,7 @@ comando_simples:
 							| output
 							| return
 							;
+
 esquerda:					
 							TK_IDENTIFIER 
 							| TK_IDENTIFIER '[' expressao ']' 

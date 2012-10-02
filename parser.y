@@ -43,11 +43,20 @@
 
 %%
 
-program:					
-							lista_declaracoes_globais funcoes 
-							| funcoes 
+program:
+							| lista_declaracoes_alto_nivel
+							;
+
+lista_declaracoes_alto_nivel:				
+							lista_declaracoes_alto_nivel declaracao_alto_nivel
+							| declaracao_alto_nivel
+							;
+
+declaracao_alto_nivel:
+							funcoes 
 							| lista_declaracoes_globais
 							;
+
 lista_declaracoes_globais:			
 							lista_declaracoes_globais declaracao_global
 							| declaracao_global

@@ -40,16 +40,18 @@
 %%
 
 program:					
-							declaracoes_globais funcoes
+							lista_declaracoes funcoes | funcoes | lista_declaracoes
 							;
-declaracoes_globais:
-							declaracao_global declaracoes_globais
-							|
+lista_declaracoes:			
+							lista_declaracoes declaracao_global
+							| declaracao_global
 							;	
+array_opcional:				
+							| '[' LIT_INTEGER ']'
+							;
 declaracao_global:
-							declaracao_variavel ';'	
-							| TK_IDENTIFIER ':'	tipo'['LIT_INTEGER']'';'
-							;	
+							declaracao_variavel array_opcional ';'	
+							;		
 declaracao_variavel:		
 							TK_IDENTIFIER ':' tipo 
 							;		
@@ -61,24 +63,24 @@ tipo:
 							;		
 funcoes:		 			
 							funcoes funcao
-							|
+							| funcao
 							;	
 funcao: 					
-							cabecalho declaracoes_locais bloco_de_comandos	
+							cabecalho bloco_de_comandos | cabecalho	lista_declaracoes bloco_de_comandos
 							;	
 cabecalho:					
-							TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')'
+							declaracao_variavel '(' lista_de_parametros ')'
 							;
 lista_de_parametros: 		
-							| parametros
+							| parametros							
 							;
 parametros:					
-							parametros , declaracao_variavel
+							parametros ',' declaracao_variavel
 							| declaracao_variavel
 							;
-declaracoes_locais: 		
-							declaracoes_locais declaracao_variavel ';'
-							|
+lista_declaracoes: 		
+							lista_declaracoes declaracao_variavel ';'
+							| declaracao_variavel ';'
 							;
 
 bloco_de_comandos:			
@@ -86,8 +88,8 @@ bloco_de_comandos:
 							| comando
 							;
 comandos:					
-							comando ';' comandos
-							| 
+							comandos ; comando
+							| comando
 							;
 comando:					
 							bloco_de_comandos
@@ -100,7 +102,7 @@ comando:
 							;
 atribuicao:					
 							TK_IDENTIFIER '=' expressao
-							| TK_IDENTIFIER'[' expressao ']' '=' expressao
+							| TK_IDENTIFIER '[' expressao ']' '=' expressao
 							;
 input:						
 							KW_INPUT TK_IDENTIFIER
@@ -112,24 +114,26 @@ return:
 							KW_RETURN expressao
 							;
 lista_de_elementos:			
-							elemento , resto_elementos
+							lista_de_elementos ',' elemento
+							| elemento
 							;
-resto_elementos:			
-							elemento , lista_de_elementos | elemento
-							;					
+			
 elemento:					
 							LIT_STRING | expressao
 							;
 expressao:					
 							expressao operador expressao
 							| '(' expressao ')' 
-							| TK_IDENTIFIER
-							| TK_IDENTIFIER '[' expressao ']' 
+							| TK_IDENTIFIER expressao_opcional
 							| LIT_INTEGER
 							| LIT_FLOA  
 							;
+							
+expressao_opcional:
+							| '[' expressao ']'
+							;
 controle_fluxo:				
-							KW_IF '('expressao')' KW_THEN comando else_opcional
+							KW_IF '('expressao')' KW_THEN else_opcional
 							| KW_WHILE '('expressao')' comando
 							;
 else_opcional:				

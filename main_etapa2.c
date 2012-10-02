@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
 	    yydebug = 1;
 #endif
 	    yyparse();
+	    printf("%s","Success! \n");
 	    exit(3);
 
 	}

@@ -1,14 +1,13 @@
-// UFRGS - Compiladores - Marcelo Johann - 2012/1
+// UFRGS - Compiladores - Marcelo Johann - 2012/2
 
 a: int;
 v: int [10];
 
-main:int ()
-  {
-  i: int;
 
+main: int ()
+  i: int;
+  {
   output "Digite um numero: ";
-  input a;
   while (i<10)
     {
     a = incn(a,1);
@@ -17,11 +16,11 @@ main:int ()
   output "Incrementado algumas vezes fica ",a,"\n"
   };
 
-incn:int (x:int, n:int)
-  return x+n;
+incn: int (x:int, n:int)
+  { return x+n; };
   
-outra:int ();
+outra: int () {};
 
-maisuma:int ()
+maisuma: int ()
   {
   };

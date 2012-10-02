@@ -4,17 +4,17 @@ a: int;
 v: int [10];
 
 
-main: int ()
+/*main: int ()
   i: int;
-  {
-  output "Digite um numero: ";
-  while (i<10)
+ /* {
+  //output "Digite um numero: ";
+  /*while (i<10)
     {
     a = incn(a,1);
     i = i + 1;
     };
   output "Incrementado algumas vezes fica ",a,"\n"
-  };
+  };*/
 
 incn: int (x:int, n:int)
   { return x+n; };

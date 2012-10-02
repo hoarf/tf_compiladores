@@ -66,7 +66,11 @@ funcoes:
 							| funcao
 							;	
 funcao: 					
-							cabecalho bloco_de_comandos | cabecalho	lista_declaracoes bloco_de_comandos
+							cabecalho declaracoes_opcional
+							;
+declaracoes_opcional:
+							lista_declaracoes bloco_de_comandos
+							| bloco_de_comandos
 							;	
 cabecalho:					
 							declaracao_variavel '(' lista_de_parametros ')'

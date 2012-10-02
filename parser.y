@@ -43,14 +43,18 @@
 
 %%
 
-program:					
-							lista_declaracoes_globais funcoes 
-							| funcoes 
-							| lista_declaracoes_globais
+program:
+							| lista_declaracoes_alto_nivel
 							;
-lista_declaracoes_globais:			
-							lista_declaracoes_globais declaracao_global
-							| declaracao_global
+
+lista_declaracoes_alto_nivel:				
+							lista_declaracoes_alto_nivel declaracao_alto_nivel
+							| declaracao_alto_nivel
+							;
+
+declaracao_alto_nivel:							
+							declaracao_global
+							| funcao
 							;	
 
 declaracao_global:
@@ -64,10 +68,6 @@ tipo:
 							| KW_BOOL
 							;
 	
-funcoes:	 			
-							funcoes funcao
-							| funcao
-							;	
 funcao: 					
 							cabecalho lista_declaracoes bloco_de_comandos 
 							| cabecalho bloco_de_comandos  

@@ -9,9 +9,9 @@ y.tab.o: y.tab.c
 	gcc -c y.tab.c
 	
 y.tab.c: parser.y
-	yacc -d parser.y
+	yacc -dv parser.y
 
-lex.yy.c: scanner.l
+lex.yy.c: scanner.l y.tab.c
 	flex --header-file=lex.yy.h scanner.l
 	
 main.o: main.c
@@ -27,4 +27,4 @@ lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 	
 clean:
-	rm *.o lex.yy.c etapa2 lex.yy.h y.tab*
+	rm lex.yy.c etapa2 lex.yy.h y.tab* *.o

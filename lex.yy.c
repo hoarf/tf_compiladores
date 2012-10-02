@@ -1988,7 +1988,6 @@ void yyfree (void * ptr )
 int lineNumber = 1;
 int getLineNumber(void) { return lineNumber; }
 
-
 int yywrap(void) {
 	return 1;
 }

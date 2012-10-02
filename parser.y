@@ -54,7 +54,7 @@ lista_declaracoes_alto_nivel:
 
 declaracao_alto_nivel:							
 							declaracao_global
-							| funcao
+							| funcao ';'
 							;	
 
 declaracao_global:
@@ -148,13 +148,23 @@ expressao:
 							| expressao '<' expressao
 							| expressao '>' expressao
 							| '(' expressao ')' 
+							| TK_IDENTIFIER '(' lista_expressoes ')'
 							| LIT_INTEGER
+							| LIT_TRUE
+							| LIT_FALSE
 							| TK_IDENTIFIER 
 							| TK_IDENTIFIER '[' expressao ']'
 							| LIT_FLOA  
 							;
 
-								
+lista_expressoes:
+							| expressoes
+							;
+							
+expressoes:					
+							expressoes ',' expressao
+							| expressao
+							;
 	
 							
 							

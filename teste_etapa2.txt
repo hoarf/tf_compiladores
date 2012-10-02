@@ -10,10 +10,9 @@ main: int (a: int , b: int)
   output "Digite um numero: ";
   while (i<10)
     {
-    //a = incn(a,1);
-    i = i+n;
+      alan = 0;
     };
-  output "Incrementado algumas vezes fica ",a,"\n"
+	output "Incrementado algumas vezes fica ",a,"\n"
   }
 
 incn: int (x:int, n:int)

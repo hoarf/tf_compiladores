@@ -86,25 +86,32 @@ lista_declaracoes:
 							;
 
 bloco_de_comandos:		
-							'{' comandos '}'
-							| '{' '}' 
+							'{' comandos '}'  
 							;
 comandos:					
-							comandos ';' comando
+							comando ';' comandos
 							| comando
-							| ';'
 							;
+comando_vazio:				
+							;
+							
 comando:					
 							bloco_de_comandos
-							| controle_fluxo							
-							| atribuicao
+							| comando_simples
+							| comando_vazio		
+							; 
+comando_simples:			
+							 KW_IF '(' expressao ')' KW_THEN comando
+							| KW_IF '(' expressao ')' KW_THEN comando KW_ELSE comando							
+							| KW_WHILE '(' expressao ')' comando							
+							| esquerda '=' expressao
 							| input
 							| output
-							| return		
-							; 
-atribuicao:					
-							TK_IDENTIFIER '=' expressao
-							| TK_IDENTIFIER '[' expressao ']' '=' expressao
+							| return
+							;
+esquerda:					
+							TK_IDENTIFIER 
+							| TK_IDENTIFIER '[' expressao ']' 
 							;
 input:						
 							KW_INPUT TK_IDENTIFIER
@@ -143,13 +150,8 @@ expressao:
 							| LIT_FLOA  
 							;
 
-controle_fluxo:				
-							KW_IF '(' expressao ')' KW_THEN bloco_de_comandos
-							| KW_IF '(' expressao ')' KW_THEN bloco_de_comandos KW_ELSE bloco_de_comandos							
-							| KW_WHILE '(' expressao ')'  bloco_de_comandos
-							;
-
-
+								
+	
 							
 							
 %%

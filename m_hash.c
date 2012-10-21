@@ -9,7 +9,7 @@ int getAddress(const char* value) {
 	return soma % HASH_SIZE;
 }
 
-void insertNode(const char* value, int type) {
+HASH_NODE * insertNode(const char* value, int type) {
 
 	int address = getAddress(value);
 	HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
@@ -19,6 +19,7 @@ void insertNode(const char* value, int type) {
 	nodo->next = NULL;
 	nodo->next = tabela[address];
 	tabela[address] = nodo;
+	return nodo;
 
 }
 

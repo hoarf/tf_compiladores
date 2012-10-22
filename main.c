@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
 	    yyin= fopen(argv[1],"r");
 		while(running) {
 			token = yylex();
-			if ( running) {
+			if (running) {
 					switch(token) {
 					case TK_IDENTIFIER:
 						printf("Linha: %i IDENTIFICADOR: %s\n",getLineNumber(),yytext);

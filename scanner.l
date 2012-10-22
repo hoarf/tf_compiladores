@@ -2,6 +2,7 @@
 	#include "m_hash.h"
 	#include "y.tab.h"
 	#include "scanner.h"
+	#include "astree.h"
 %}
 
 %x COMENTARIO
@@ -24,18 +25,18 @@ output				{ return KW_OUTPUT; }
 "<="				{ return OPERATOR_LE; }
 ">="				{ return OPERATOR_GE; }
 "=="				{ return OPERATOR_EQ; }
-"!="					{ return OPERATOR_NE; }
+"!="				{ return OPERATOR_NE; }
 "&&"				{ return OPERATOR_AND; }
 "||"				{ return OPERATOR_OR; }
 
 false	 			{ return LIT_FALSE; }
 true 				{ return LIT_TRUE; }
 
-L?\"(\\.|[^\\"])*\"				{ trimQuotes(yytext) ; insertNode(yytext,SYMBOL_LIT_STRING) ; return LIT_STRING; }
-[a-zA-Z][_a-zA-Z0-9]* 	{ insertNode(yytext,SYMBOL_IDENTIFIER) ; return TK_IDENTIFIER; }
-[-]?[0-9]*"."[0-9]+ { insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
-[-]?[0-9]+ 		{ insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
-"'"[a-zA-Z]"'" 		{ char valorChar = yytext[1] ; insertNode(&valorChar,SYMBOL_LIT_CHAR) ; return LIT_CHAR; }
+L?\"(\\.|[^\\"])*\"		{ trimQuotes(yytext) ; create(SYMBOL, insertNode(yytext,SYMBOL_LIT_STRING), NULL, NULL, NULL, NULL) ; return LIT_STRING; }
+[a-zA-Z][_a-zA-Z0-9]* 	{ create(SYMBOL, insertNode(yytext,SYMBOL_IDENTIFIER),NULL,NULL,NULL,NULL) ; return TK_IDENTIFIER; }
+[-]?[0-9]*"."[0-9]+ 	{ create(SYMBOL,insertNode(yytext,SYMBOL_LIT_FLOATING),NULL,NULL,NULL,NULL) ; return LIT_FLOA; }
+[-]?[0-9]+ 				{ create(SYMBOL,insertNode(yytext,SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL) ; return LIT_INTEGER; }
+"'"[a-zA-Z]"'" 			{ char valorChar = yytext[1] ; create(SYMBOL,insertNode(&valorChar,SYMBOL_LIT_CHAR),NULL,NULL,NULL,NULL) ; return LIT_CHAR; }
 
 [ \t]				{}
 \n					{ ++lineNumber; }

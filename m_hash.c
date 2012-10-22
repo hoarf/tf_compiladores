@@ -1,6 +1,5 @@
 #include "m_hash.h"
 
-
 /* fonte: http://research.cs.vt.edu/AVresearch/hashing/strings.php */
 int getAddress(const char* value) {
 	int i, soma = 0;
@@ -10,7 +9,6 @@ int getAddress(const char* value) {
 }
 
 HASH_NODE * insertNode(const char* value, int type) {
-
 	int address = getAddress(value);
 	HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
 	nodo->type = type;
@@ -20,9 +18,7 @@ HASH_NODE * insertNode(const char* value, int type) {
 	nodo->next = tabela[address];
 	tabela[address] = nodo;
 	return nodo;
-
 }
-
 
 void initMe(void) {
 	int i;

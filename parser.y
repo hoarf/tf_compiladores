@@ -2,7 +2,63 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "astree.h"
+#include "scanner.h"
+
 #define YYDEBUG 1
+
+#define AST_SYMBOL 			0
+#define AST_PROGRAM 			1
+#define AST_LDAN 			2
+#define AST_DAN 			3
+#define AST_DG	 			4
+#define AST_TIPO			5
+#define AST_FUNCAO			6
+#define AST_CAB				7
+#define AST_LPAR			8
+#define AST_PAR				9
+#define AST_LDEC			10
+#define AST_BCOM			11
+#define AST_COM				12
+#define AST_LCOM			13
+#define AST_COMV			14
+#define AST_COM				15
+#define AST_COMS			16
+#define AST_ESQ				17
+#define AST_INPUT			18
+#define AST_OUTPUT			19
+#define AST_RETURN			20
+#define AST_LSTELEM 			21
+#define AST_ELEM 			22
+#define AST_GVARDEC 			23
+#define AST_GVECDEC 			24
+#define AST_ADD 			25
+#define AST_SUB 			26
+#define AST_MUL 			27
+#define AST_DIV 			28
+#define AST_INT 			29
+#define AST_FLOA 			30
+#define AST_CHAR 			31
+#define AST_BOOL 			32
+#define AST_IF				33
+#define AST_IFEL			34
+#define AST_WHILE			35
+#define AST_ATTRIB			36
+#define AST_INPUT			37
+#define AST_OUTPUT			38
+#define AST_RETURN			39
+#define AST_ESQVAR			40
+#define AST_ESQVEC			41
+#define AST_CALL			42
+#define AST_VAR				43
+#define AST_VEC				44
+#define AST_LSTEXPR 			45
+#define AST_EXPRS 			46
+#define AST_EXPR 			47
+
+int yylex(void);
+void yyerror(char *);
 
 %}
 
@@ -26,148 +82,171 @@
 %token OPERATOR_AND
 %token OPERATOR_OR
 
-%token TK_IDENTIFIER
-%token LIT_INTEGER
-%token LIT_FLOA
-%token LIT_FALSE
-%token LIT_TRUE
-%token LIT_CHAR
-%token LIT_STRING
+%token <symbol>TK_IDENTIFIER
+%token <symbol>LIT_INTEGER
+%token <symbol>LIT_FLOA
+%token <symbol>LIT_FALSE
+%token <symbol>LIT_TRUE
+%token <symbol>LIT_CHAR
+%token <symbol>LIT_STRING
 
 %token TOKEN_ERROR
+
+%type <ast>program
+%type <ast>lista_declaracoes_alto_nivel
+%type <ast>declaracao_alto_nivel
+%type <ast>declaracao_global
+%type <ast>tipo
+%type <ast>funcao
+%type <ast>cabecalho
+%type <ast>lista_de_parametros
+%type <ast>lista_declaracoes
+%type <ast>bloco_de_comandos
+%type <ast>comandos
+%type <ast>lista_comandos
+%type <ast>comando_vazio
+%type <ast>comando
+%type <ast>comando_simples
+%type <ast>esquerda
+%type <ast>input
+%type <ast>output
+%type <ast>return
+%type <ast>lista_de_elementos
+%type <ast>elemento
+%type <ast>expressao
+%type <ast>lista_expressoes
+%type <ast>expressoes
 
 %left OPERATOR_LE  OPERATOR_GE  OPERATOR_EQ  OPERATOR_NE  OPERATOR_AND OPERATOR_OR '<' '>'
 %left '-'  '+'
 %left '*'  '/'
 
+//%left OPERADOR_AND OPERATOR_OR
+//%nonassoc OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE '<' '>'
 
 %%
 
 program:
-							| lista_declaracoes_alto_nivel
-							;
+	lista_declaracoes_alto_nivel { $$ = create(AST_LDAN,0,$1,0,0,0); /*exibeASTREE();*/ }
+	| { /*exibeASTREE();*/ }
+	;
 
 lista_declaracoes_alto_nivel:				
-							lista_declaracoes_alto_nivel declaracao_alto_nivel
-							| declaracao_alto_nivel
-							;
+	lista_declaracoes_alto_nivel declaracao_alto_nivel { $$ = create(AST_LDAN,0,$1,$2,0,0); }
+	| declaracao_alto_nivel { $$ = create(AST_DAN,0,$1,0,0,0); }
+	;
 
 declaracao_alto_nivel:							
-							declaracao_global
-							| funcao ';'
-							;	
-
+	declaracao_global { $$ = create(AST_DG,0,$1,0,0,0); }
+	| funcao ';' { $$ = create(AST_FUNCAO,0,$1,0,0,0); }
+	;	
 declaracao_global:
-							TK_IDENTIFIER ':' tipo ';'
-							| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' 
-							;		
-tipo:						
-							KW_INT
-							| KW_FLOAT
-							| KW_CHAR
-							| KW_BOOL
-							;
-	
+	TK_IDENTIFIER ':' tipo ';' { $$ = create(AST_GVARDEC,$1,$3,0,0,0); }
+	| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' { $$ = create(AST_GVECDEC,$1,$3,$5,0,0); } 
+	;		
+tipo:				
+	KW_INT { $$ = create(AST_INT,0,0,0,0,0); }
+	| KW_FLOAT { $$ = create(AST_FLOA,0,0,0,0,0); }
+	| KW_CHAR { $$ = create(AST_CHAR,0,0,0,0,0); }
+	| KW_BOOL { $$ = create(AST_BOOL,0,0,0,0,0); }
+	;
 funcao: 					
-							cabecalho lista_declaracoes bloco_de_comandos 
-							| cabecalho bloco_de_comandos  
-							;
+	cabecalho lista_declaracoes bloco_de_comandos { $$ = create(AST_CAB,0,$1,$2,$3,0); }
+	| cabecalho bloco_de_comandos  { $$ = create(AST_CAB,0,$1,0,$2,0); }
+	;
 cabecalho:					
-							TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')'
-							| TK_IDENTIFIER ':' tipo '('  ')'
-							;
+	TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')' { $$ = create(AST_CAB,$1,$3,$5,0,0); }
+	| TK_IDENTIFIER ':' tipo '('  ')' { $$ = create(AST_CAB,$1,$3,0,0,0); }
+	;
 lista_de_parametros:					
-							lista_de_parametros ',' TK_IDENTIFIER ':' tipo
-							| TK_IDENTIFIER ':' tipo
-							;
+	lista_de_parametros ',' TK_IDENTIFIER ':' tipo { $$ = create(AST_LPAR,$3,$5,$1,0,0); }
+	| TK_IDENTIFIER ':' tipo { $$ = create(AST_PAR,$1,$3,0,0,0); }
+	;
 lista_declaracoes: 		
-							lista_declaracoes TK_IDENTIFIER ':' tipo ';'
-							| TK_IDENTIFIER ':' tipo ';'
-							;
-
+	lista_declaracoes TK_IDENTIFIER ':' tipo ';' { $$ = create(AST_LDEC,$2,$4,$1,0,0); }
+	| TK_IDENTIFIER ':' tipo ';' { $$ = create(AST_LDEC,$1,$3,0,0,0); }
+	;
 bloco_de_comandos:		
-							'{' comandos '}'  
-							;
+	'{' comandos '}' { $$ = create(AST_BCOM,0,$2,0,0,0); }
+	;
 comandos:
-							| lista_comandos
-							; 
+	lista_comandos { $$ = create(AST_COMS,0,$1,0,0,0); }
+	| { $$ = 0; }
+	; 
 lista_comandos:					
-							comando ';' lista_comandos
-							| comando
-							;
-comando_vazio:				
-							;
-							
+	comando ';' lista_comandos { $$ = create(AST_LCOM,0,$1,$3,0,0); }
+	| comando { $$ = create(AST_COM,0,$1,0,0,0); }
+	;
+comando_vazio:			
+	{ $$ = 0; }	
+	;							
 comando:					
-							bloco_de_comandos
-							| comando_simples
-							| comando_vazio		
-							; 
+	bloco_de_comandos { $$ = create(AST_BCOM,0,$1,0,0,0); }
+	| comando_simples { $$ = create(AST_COMS,0,$1,0,0,0); }
+	| comando_vazio { $$ = create(AST_CV,0,0,0,0,0); }
+	;
 comando_simples:			
-							 KW_IF '(' expressao ')' KW_THEN comando
-							| KW_IF '(' expressao ')' KW_THEN comando KW_ELSE comando							
-							| KW_WHILE '(' expressao ')' comando							
-							| esquerda '=' expressao
-							| input
-							| output
-							| return
-							;
-
+	KW_IF '(' expressao ')' KW_THEN comando { $$ = create(AST_IF,0,$3,$6,0,0); }
+	| KW_IF '(' expressao ')' KW_THEN comando KW_ELSE comando { $$ = create(AST_IFEL,0,$3,$6,$8,0); }
+	| KW_WHILE '(' expressao ')' comando { $$ = create(AST_WHILE,0,$3,$5,0,0); }
+	| esquerda '=' expressao { $$ = create(AST_ATTRIB,0,$1,$3,0,0); }
+	| input { $$ = create(AST_INPUT,0,$1,0,0,0); }
+	| output { $$ = create(AST_OUTPUT,0,$1,0,0,0); }
+	| return { $$ = create(AST_RETURN,0,$1,0,0,0); }
+	;
 esquerda:					
-							TK_IDENTIFIER 
-							| TK_IDENTIFIER '[' expressao ']' 
-							;
+		TK_IDENTIFIER { $$ = create(AST_ESQVAR,$1,0,0,0,0); }
+		| TK_IDENTIFIER '[' expressao ']' { $$ = create(AST_ESQVEC,$1,$3,0,0,0); }
+		;
 input:						
-							KW_INPUT TK_IDENTIFIER
-							;
+		KW_INPUT TK_IDENTIFIER { $$ = create(AST_INPUT,$2,0,0,0,0); }
+		;
 output:						
-							KW_OUTPUT lista_de_elementos
-							;
+		KW_OUTPUT lista_de_elementos { $$ = create(AST_OUTPUT,0,$2,0,0,0); }
+		;
 return:						
-							KW_RETURN expressao
-							;
+		KW_RETURN expressao { $$ = create(AST_RETURN,0,$2,0,0,0); }
+		;
 lista_de_elementos:			
-							lista_de_elementos ',' elemento
-							| elemento
-							;
-			
+		lista_de_elementos ',' elemento { $$ = create(AST_LSTELEM,0,$1,$3,0,0); }
+		| elemento { $$ = create(AST_ELEM,0,$1,0,0,0); }
+		;
 elemento:					
-							LIT_STRING | expressao
-							;
-expressao:					
-							expressao '+' expressao
-							| expressao OPERATOR_LE expressao
-							| expressao OPERATOR_GE expressao
-							| expressao OPERATOR_EQ expressao
-							| expressao OPERATOR_NE expressao
-							| expressao OPERATOR_AND expressao
-							| expressao OPERATOR_OR expressao
-							| expressao '-' expressao
-							| expressao '/' expressao
-							| expressao '*' expressao
-							| expressao '<' expressao
-							| expressao '>' expressao
-							| '(' expressao ')' 
-							| TK_IDENTIFIER '(' lista_expressoes ')'
-							| LIT_INTEGER
-							| LIT_TRUE
-							| LIT_FALSE
-							| TK_IDENTIFIER 
-							| TK_IDENTIFIER '[' expressao ']'
-							| LIT_FLOA  
-							;
-
+		LIT_STRING { $$ = create(AST_ELEM,$1,0,0,0,0); }
+		| expressao { $$ = create(AST_ELEM,0,$1,0,0,0); }
+		;
 lista_expressoes:
-							| expressoes
-							;
-							
-expressoes:					
-							expressoes ',' expressao
-							| expressao
-							;
-	
-							
-							
+		| expressoes { $$ = create(AST_LSTEXPRS,0,$1,0,0,0); }
+		;
+expressoes:
+		expressoes ',' expressao { $$ = create(AST_EXPRS,0,0,0,0,0); }
+		| expressao { $$ = create(AST_EXPR,0,$1,0,0,0); }
+		;
+expressao:					
+		expressao '+' expressao { $$ = create(AST_ADD,0,0,0,0,0); }
+		| expressao OPERATOR_LE expressao { $$ = create(AST_LE,0,$1,$3,0,0); }
+		| expressao OPERATOR_GE expressao { $$ = create(AST_GE,0,$1,$3,0,0); }
+		| expressao OPERATOR_EQ expressao { $$ = create(AST_EQ,0,$1,$3,0,0); }
+		| expressao OPERATOR_NE expressao { $$ = create(AST_NE,0,$1,$3,0,0); }
+		| expressao OPERATOR_AND expressao { $$ = create(AST_AND,0,$1,$3,0,0); }
+		| expressao OPERATOR_OR expressao { $$ = create(AST_OR,0,$1,$3,0,0); }
+		| expressao '-' expressao { $$ = create(AST_MINUS,0,$1,$3,0,0); }
+		| expressao '/' expressao { $$ = create(AST_DIV,0,$1,$3,0,0); }
+		| expressao '*' expressao { $$ = create(AST_MULT,0,$1,$3,0,0); }
+		| expressao '<' expressao { $$ = create(AST_LT,0,$1,$3,0,0); }
+		| expressao '>' expressao { $$ = create(AST_GT,0,$1,$3,0,0); }
+		| '(' expressao ')' { $$ = create(AST_PAREXP,0,$2,0,0,0); }
+		| TK_IDENTIFIER '(' lista_expressoes ')' { $$ = create(AST_CALL,$1,$3,0,0,0); }
+		| TK_IDENTIFIER { $$ = create(AST_VAR,$1,0,0,0,0); }
+		| TK_IDENTIFIER '[' expressao ']' { $$ = create(AST_VEC,$1,$3,0,0,0); }
+		| LIT_INTEGER { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		| LIT_FLOA { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		| LIT_TRUE { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		| LIT_FALSE { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		| LIT_CHAR { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		| LIT_STRING { $$ = create(AST_SYMBOL,$1,0,0,0,0); }
+		;
+
 %%
 
 int yyerror(char* s) {

@@ -28,7 +28,7 @@ int getAddress(const char* value);
 
 HASH_NODE* tabela[HASH_SIZE];
 
-void insertNode(const char* value, int type);
+HASH_NODE * insertNode(const char* value, int type);
 
 void print(void);
 

@@ -7,9 +7,14 @@
 #define YYDEBUG 1
 
 int yylex(void);
-void yyerror(char *);
+int yyerror(char *);
 
 %}
+
+%union {
+	 HASH_NODE * symbol;
+	 struct _ASTREE * ast;
+}
 
 %token KW_INT
 %token KW_FLOAT
@@ -76,8 +81,8 @@ void yyerror(char *);
 %%
 
 program:
-	lista_declaracoes_alto_nivel { $$ = create(AST_LDAN,0,$1,0,0,0); /*exibeASTREE();*/ }
-	| { /*exibeASTREE();*/ }
+	lista_declaracoes_alto_nivel { $$ = create(AST_LDAN,0,$1,0,0,0); exibeASTREE($$,0); }
+	| { exibeASTREE($$,0); }
 	;
 
 lista_declaracoes_alto_nivel:				
@@ -91,7 +96,7 @@ declaracao_alto_nivel:
 	;	
 declaracao_global:
 	TK_IDENTIFIER ':' tipo ';' { $$ = create(AST_GVARDEC,$1,$3,0,0,0); }
-	| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' { $$ = create(AST_GVECDEC,$1,$3,$5,0,0); } 
+	| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' { $$ = create(AST_GVECDEC,0,$1,$3,$5,0); } 
 	;		
 tipo:				
 	KW_INT { $$ = create(AST_INT,0,0,0,0,0); }

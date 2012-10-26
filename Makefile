@@ -1,9 +1,9 @@
 
-etapa2: lex.yy.o main_etapa2.o m_hash.o y.tab.o 
-	gcc -o etapa2 lex.yy.o m_hash.o main_etapa2.o y.tab.o
+etapa3: lex.yy.o main_etapa2.o m_hash.o y.tab.o astree.o
+	gcc -o etapa3 lex.yy.o m_hash.o astree.o main_etapa2.o y.tab.o
 
-etapa1: lex.yy.o main.o m_hash.o
-	gcc -o etapa1 lex.yy.o m_hash.o main.o
+astree.o: astree.c
+	gcc -c astree.c
 
 y.tab.o: y.tab.c
 	gcc -c y.tab.c
@@ -25,6 +25,17 @@ m_hash.o: m_hash.c
 	
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
+
+test: astree_test
+	./astree_test
+	
+astree_test: astree_test.o astree.o m_hash.o
+	gcc -o astree_test astree_test.o astree.o m_hash.o	
+
+astree_test.o: astree_test.c
+	gcc -c astree_test.c 
+	
+	
 	
 clean:
 	rm lex.yy.c etapa2 lex.yy.h y.tab* *.o

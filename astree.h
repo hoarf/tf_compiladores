@@ -1,7 +1,7 @@
 #ifndef ASTREE_H_
 #define ASTREE_H_
 
-#include "m_hash.c"
+#include "m_hash.h"
 
 
 #define AST_SYMBOL 			0
@@ -19,7 +19,6 @@
 #define AST_COM				12
 #define AST_LCOM			13
 #define AST_COMV			14
-#define AST_COM				15
 #define AST_COMS			16
 #define AST_ESQ				17
 #define AST_INPUT			18
@@ -41,9 +40,6 @@
 #define AST_IFEL			34
 #define AST_WHILE			35
 #define AST_ATTRIB			36
-#define AST_INPUT			37
-#define AST_OUTPUT			38
-#define AST_RETURN			39
 #define AST_ESQVAR			40
 #define AST_ESQVEC			41
 #define AST_CALL			42
@@ -53,21 +49,34 @@
 #define AST_EXPRS 			46
 #define AST_EXPR 			47
 
+// ?????
+#define AST_CV 				50
+#define AST_LSTEXPRS		51
+#define AST_LE				52
+#define AST_GE		 		53
+#define AST_EQ	 			54
+#define AST_NE	 			55
+#define AST_AND				56
+#define AST_OR				57
+#define AST_MINUS	 		58
+#define AST_MULT 			59
+#define AST_LT	 			60
+#define AST_PAREXP			61
+#define AST_GT				62
 
-typedef struct _ASTREE {
+typedef struct _ASTREE ASTREE;
+
+struct _ASTREE {
 	int type;
-	ASTREE* son1;
-	ASTREE* son2;
-	ASTREE* son3;
-	ASTREE* son4;
+	ASTREE* sons[4];
 	HASH_NODE * symbol;
 
-} ASTREE;
+} ;
 
 ASTREE* ast;
 
-ASTREE * create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
+ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
 
-void exibeASTREE(ASTREE* arvore, int level);
+void astree_exibe(ASTREE* arvore, int level);
 
 #endif /* ASTREE_H_ */

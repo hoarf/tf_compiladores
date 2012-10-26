@@ -5,6 +5,8 @@
 	#include "astree.h"
 %}
 
+
+
 %x COMENTARIO
 
 %%
@@ -32,11 +34,11 @@ output				{ return KW_OUTPUT; }
 false	 			{ return LIT_FALSE; }
 true 				{ return LIT_TRUE; }
 
-L?\"(\\.|[^\\"])*\"		{ trimQuotes(yytext) ; create(SYMBOL, insertNode(yytext,SYMBOL_LIT_STRING), NULL, NULL, NULL, NULL) ; return LIT_STRING; }
-[a-zA-Z][_a-zA-Z0-9]* 	{ create(SYMBOL, insertNode(yytext,SYMBOL_IDENTIFIER),NULL,NULL,NULL,NULL) ; return TK_IDENTIFIER; }
-[-]?[0-9]*"."[0-9]+ 	{ create(SYMBOL,insertNode(yytext,SYMBOL_LIT_FLOATING),NULL,NULL,NULL,NULL) ; return LIT_FLOA; }
-[-]?[0-9]+ 				{ create(SYMBOL,insertNode(yytext,SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL) ; return LIT_INTEGER; }
-"'"[a-zA-Z]"'" 			{ char valorChar = yytext[1] ; create(SYMBOL,insertNode(&valorChar,SYMBOL_LIT_CHAR),NULL,NULL,NULL,NULL) ; return LIT_CHAR; }
+L?\"(\\.|[^\\"])*\"		{ trimQuotes(yytext) ; create(AST_SYMBOL, insertNode(yytext,SYMBOL_LIT_STRING), NULL, NULL, NULL, NULL) ; return LIT_STRING; }
+[a-zA-Z][_a-zA-Z0-9]* 	{ create(AST_SYMBOL, insertNode(yytext,SYMBOL_IDENTIFIER),NULL,NULL,NULL,NULL) ; return TK_IDENTIFIER; }
+[-]?[0-9]*"."[0-9]+ 	{ create(AST_SYMBOL,insertNode(yytext,SYMBOL_LIT_FLOATING),NULL,NULL,NULL,NULL) ; return LIT_FLOA; }
+[-]?[0-9]+ 				{ create(AST_SYMBOL,insertNode(yytext,SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL) ; return LIT_INTEGER; }
+"'"[a-zA-Z]"'" 			{ char valorChar = yytext[1] ; create(AST_SYMBOL,insertNode(&valorChar,SYMBOL_LIT_CHAR),NULL,NULL,NULL,NULL) ; return LIT_CHAR; }
 
 [ \t]				{}
 \n					{ ++lineNumber; }

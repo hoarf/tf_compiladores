@@ -132,7 +132,7 @@ lista_comandos:
 	| comando { $$ = create(AST_COM,0,$1,0,0,0); }
 	;
 comando_vazio:			
-	{ $$ = 0; }	
+	{ $$ = create(AST_COMV,0,0,0,0,0); }	
 	;							
 comando:					
 	bloco_de_comandos { $$ = create(AST_BCOM,0,$1,0,0,0); }

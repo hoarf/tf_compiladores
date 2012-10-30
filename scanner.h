@@ -5,7 +5,7 @@
 
 int lineNumber;
 int getLineNumber(void);
-
+void trimQuotes(char * source);
 
 #endif /* SCANNER_H_ */
 

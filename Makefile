@@ -26,10 +26,8 @@ m_hash.o: m_hash.c
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 
-test: astree_test
-	./astree_test
-	
-astree_test: astree_test.o astree.o m_hash.o
+
+test: astree_test.o astree.o m_hash.o
 	gcc -o astree_test astree_test.o astree.o m_hash.o	
 
 astree_test.o: astree_test.c

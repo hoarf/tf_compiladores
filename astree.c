@@ -204,7 +204,7 @@ char * insereTabulacao(int level) {
 void imprimeNodo(ASTREE* arvore,FILE * file) {
 	puts(getNodeString(arvore->type));
 	int i;
-	for (i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		imprimeNodo(arvore->sons[i],file);
 	}
 }

@@ -17,85 +17,85 @@ ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, A
 const char * selecionaMensagemPorTipo(int tipo) {
 	switch (tipo) {
 	case AST_SYMBOL:
-		return "0";
+		return "AST_SYMBOL";
 	case AST_PROGRAM:
-		return "1";
+		return "AST_PROGRAM";
 	case AST_LDAN:
-		return "2";
+		return "AST_LDAN";
 	case AST_DAN:
-		return "3";
+		return "AST_DAN";
 	case AST_DG:
-		return "4";
+		return "AST_DG";
 	case AST_TIPO:
-		return "5";
+		return "AST_TIPO";
 	case AST_FUNCAO:
-		return "6";
+		return "AST_FUNCAO";
 	case AST_CAB:
-		return "7";
+		return "AST_CAB";
 	case AST_LPAR:
-		return "8";
+		return "AST_LPAR";
 	case AST_PAR:
-		return "9";
+		return "AST_PAR";
 	case AST_LDEC:
-		return "10";
+		return "AST_LDEC";
 	case AST_BCOM:
-		return "11";
+		return "AST_BCOM";
 	case AST_LCOM:
-		return "13";
+		return "AST_LCOM";
 	case AST_COMV:
-		return "14";
+		return "AST_COMV";
 	case AST_COMS:
-		return "16";
+		return "AST_COMS";
 	case AST_ESQ:
-		return "17";
+		return "AST_ESQ";
 	case AST_LSTELEM:
-		return "21";
+		return "AST_LSTELEM";
 	case AST_ELEM:
-		return "22";
+		return "AST_ELEM";
 	case AST_GVARDEC:
-		return "23";
+		return "AST_GVARDEC";
 	case AST_GVECDEC:
-		return "24";
+		return "AST_GVECDEC";
 	case AST_ADD:
-		return "25";
+		return "AST_ADD";
 	case AST_SUB:
-		return "26";
+		return "AST_SUB";
 	case AST_MUL:
-		return "27";
+		return "AST_MUL";
 	case AST_DIV:
-		return "28";
+		return "AST_DIV";
 	case AST_INT:
-		return "29";
+		return "AST_INT";
 	case AST_FLOA:
-		return "30";
+		return "AST_FLOA";
 	case AST_CHAR:
-		return "31";
+		return "AST_CHAR";
 	case AST_BOOL:
-		return "32";
+		return "AST_BOOL";
 	case AST_IF:
-		return "33";
+		return "AST_IF";
 	case AST_IFEL:
-		return "34";
+		return "AST_IFEL";
 	case AST_WHILE:
-		return "35";
+		return "AST_WHILE";
 	case AST_ATTRIB:
-		return "36";
+		return "AST_ATTRIB";
 	case AST_ESQVAR:
-		return "40";
+		return "AST_ESQVAR";
 	case AST_ESQVEC:
-		return "41";
+		return "AST_ESQVEC";
 	case AST_CALL:
-		return "42";
+		return "AST_CALL";
 	case AST_VAR:
-		return "43";
+		return "AST_VAR";
 	case AST_VEC:
-		return "44";
+		return "AST_VEC";
 	case AST_LSTEXPR:
-		return "45";
+		return "AST_LSTEXPR";
 	case AST_EXPRS:
-		return "46";
+		return "AST_EXPRS";
 	case AST_EXPR:
-		return "47";
+		return "AST_EXPR";
 	default:
 		return "????";
 	}
@@ -202,16 +202,16 @@ char * insereTabulacao(int level) {
 }
 
 void imprimeNodo(ASTREE* arvore,FILE * file) {
-	puts(getNodeString(arvore->type));
+	//puts(getNodeString(arvore->type));
 	int i;
-	for (int i = 0; i < 4; ++i) {
+	for (i = 0; i < 4; ++i) {
 		imprimeNodo(arvore->sons[i],file);
 	}
 }
 
-void astree_toFile(ASTREE*arvore,  char* filenName) {
-	FILE * fp = fopen( filenName,  "rw" );
-	imprimeNodo(arvore,fp);
+void astree_toFile(ASTREE*arvore, const char* filenName) {
+	FILE * fp = fopen( filenName,  "w" );
+	//imprimeNodo(arvore,fp);
 	fclose(fp);
 }
 

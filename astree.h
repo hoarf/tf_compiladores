@@ -79,6 +79,6 @@ ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, A
 
 void astree_exibe(ASTREE* arvore, int level);
 
-void astree_toFile(ASTREE* arvore, char* filenName);
+void astree_toFile(ASTREE* arvore,const char* filenName);
 
 #endif /* ASTREE_H_ */

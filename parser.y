@@ -70,6 +70,7 @@ int yyerror(char *);
 %type <ast>expressao
 %type <ast>lista_expressoes
 %type <ast>expressoes
+%type <ast>tipo_cont
 
 %left OPERATOR_LE  OPERATOR_GE  OPERATOR_EQ  OPERATOR_NE  OPERATOR_AND OPERATOR_OR '<' '>'
 %left '-'  '+'
@@ -78,36 +79,46 @@ int yyerror(char *);
 %%
 
 program:
-	lista_declaracoes_alto_nivel { $$ = astree_create(AST_PROGRAM,0,$1,0,0,0); astree_exibe($$,0); }
-	| { $$ = NULL;  astree_exibe($$,0); }
+	lista_declaracoes_alto_nivel { 
+	  $$ = astree_create(AST_PROGRAM,0,$1,0,0,0); 
+	  astree_exibe($$,0); 
+	  astree_toFile($$,"tmp1.tmp");
+	}
+	
+	| { $$ = 0;}
 	;
 
 lista_declaracoes_alto_nivel:
 	lista_declaracoes_alto_nivel declaracao_alto_nivel { $$ = astree_create(AST_LDAN,0,$1,$2,0,0); }
-	| declaracao_alto_nivel { $$ = astree_create(AST_DAN,0,$1,0,0,0); }
+	| declaracao_alto_nivel 
 	;
 
 declaracao_alto_nivel:
-	declaracao_global { $$ = astree_create(AST_DG,0,$1,0,0,0); }
-	| funcao ';' { $$ = astree_create(AST_FUNCAO,0,$1,0,0,0); }
+	declaracao_global 
+	| funcao ';' 
 	;	
 declaracao_global:
 	TK_IDENTIFIER ':' tipo ';' { $$ = astree_create(AST_GVARDEC,$1,$3,0,0,0); }
-	| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' { $$ = astree_create(AST_GVECDEC,0,$1,$3,$5,0); } 
-	;		
+	| TK_IDENTIFIER ':' tipo '[' tipo_cont ']' ';' { $$ = astree_create(AST_GVECDEC,$1,$3,$5,0,0); } 
+	;
+	
+tipo_cont:
+	LIT_INTEGER { $$ = astree_create(AST_INT,$1,0,0,0,0); } 
+	;
+
 tipo:
 	KW_INT { $$ = astree_create(AST_INT,0,0,0,0,0); }
 	| KW_FLOAT { $$ = astree_create(AST_FLOA,0,0,0,0,0); }
 	| KW_CHAR { $$ = astree_create(AST_CHAR,0,0,0,0,0); }
 	| KW_BOOL { $$ = astree_create(AST_BOOL,0,0,0,0,0); }
 	;
-funcao: 					
+funcao:
 	cabecalho lista_declaracoes bloco_de_comandos { $$ = astree_create(AST_CAB,0,$1,$2,$3,0); }
-	| cabecalho bloco_de_comandos  { $$ = astree_create(AST_CAB,0,$1,0,$2,0); }
+	| cabecalho bloco_de_comandos  { $$ = astree_create(AST_CAB,0,$1,$2,0,0); }
 	;
 cabecalho:					
-	TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')' { $$ = astree_create(AST_CAB,0,$1,$3,$5,0); }
-	| TK_IDENTIFIER ':' tipo '('  ')' { $$ = astree_create(AST_CAB,0,$1,$3,0,0); }
+	TK_IDENTIFIER ':' tipo '(' lista_de_parametros ')' { $$ = astree_create(AST_CAB,$1,$3,$5,0,0); }
+	| TK_IDENTIFIER ':' tipo '('  ')' { $$ = astree_create(AST_CAB,$1,$3,0,0,0); }
 	;
 lista_de_parametros:					
 	lista_de_parametros ',' TK_IDENTIFIER ':' tipo { $$ = astree_create(AST_LPAR,$3,$5,$1,0,0); }
@@ -121,19 +132,19 @@ bloco_de_comandos:
 	'{' comandos '}' { $$ = astree_create(AST_BCOM,0,$2,0,0,0); }
 	;
 comandos:
-	lista_comandos { $$ = astree_create(AST_COMS,0,$1,0,0,0); }
+	lista_comandos 
 	| { $$ = 0; }
 	; 
 lista_comandos:					
 	comando ';' lista_comandos { $$ = astree_create(AST_LCOM,0,$1,$3,0,0); }
-	| comando { $$ = astree_create(AST_COM,0,$1,0,0,0); }
+	| comando 
 	;
 comando_vazio:			
 	{ $$ = astree_create(AST_COMV,0,0,0,0,0); }	
 	;							
 comando:					
-	bloco_de_comandos { $$ = astree_create(AST_BCOM,0,$1,0,0,0); }
-	| comando_simples { $$ = astree_create(AST_COMS,0,$1,0,0,0); }
+	bloco_de_comandos 
+	| comando_simples 
 	| comando_vazio { $$ = astree_create(AST_CV,0,0,0,0,0); }
 	;
 comando_simples:			
@@ -141,9 +152,9 @@ comando_simples:
 	| KW_IF '(' expressao ')' KW_THEN comando KW_ELSE comando { $$ = astree_create(AST_IFEL,0,$3,$6,$8,0); }
 	| KW_WHILE '(' expressao ')' comando { $$ = astree_create(AST_WHILE,0,$3,$5,0,0); }
 	| esquerda '=' expressao { $$ = astree_create(AST_ATTRIB,0,$1,$3,0,0); }
-	| input { $$ = astree_create(AST_INPUT,0,$1,0,0,0); }
-	| output { $$ = astree_create(AST_OUTPUT,0,$1,0,0,0); }
-	| return { $$ = astree_create(AST_RETURN,0,$1,0,0,0); }
+	| input 
+	| output 
+	| return 
 	;
 esquerda:					
 		TK_IDENTIFIER { $$ = astree_create(AST_ESQVAR,$1,0,0,0,0); }
@@ -160,18 +171,18 @@ return:
 		;
 lista_de_elementos:			
 		lista_de_elementos ',' elemento { $$ = astree_create(AST_LSTELEM,0,$1,$3,0,0); }
-		| elemento { $$ = astree_create(AST_ELEM,0,$1,0,0,0); }
+		| elemento 
 		;
 elemento:					
 		LIT_STRING { $$ = astree_create(AST_ELEM,$1,0,0,0,0); }
-		| expressao { $$ = astree_create(AST_ELEM,0,$1,0,0,0); }
+		| expressao 
 		;
-lista_expressoes:
-		| expressoes { $$ = astree_create(AST_LSTEXPRS,0,$1,0,0,0); }
+lista_expressoes: { $$ = 0; }
+		| expressoes 
 		;
 expressoes:
 		expressoes ',' expressao { $$ = astree_create(AST_EXPRS,0,0,0,0,0); }
-		| expressao { $$ = astree_create(AST_EXPR,0,$1,0,0,0); }
+		| expressao 
 		;
 expressao:					
 		expressao '+' expressao { $$ = astree_create(AST_ADD,0,0,0,0,0); }

@@ -75,9 +75,6 @@ int yyerror(char *);
 %left '-'  '+'
 %left '*'  '/'
 
-//%left OPERADOR_AND OPERATOR_OR
-//%nonassoc OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE '<' '>'
-
 %%
 
 program:
@@ -85,12 +82,12 @@ program:
 	| { $$ = NULL;  astree_exibe($$,0); }
 	;
 
-lista_declaracoes_alto_nivel:				
+lista_declaracoes_alto_nivel:
 	lista_declaracoes_alto_nivel declaracao_alto_nivel { $$ = astree_create(AST_LDAN,0,$1,$2,0,0); }
 	| declaracao_alto_nivel { $$ = astree_create(AST_DAN,0,$1,0,0,0); }
 	;
 
-declaracao_alto_nivel:							
+declaracao_alto_nivel:
 	declaracao_global { $$ = astree_create(AST_DG,0,$1,0,0,0); }
 	| funcao ';' { $$ = astree_create(AST_FUNCAO,0,$1,0,0,0); }
 	;	
@@ -98,7 +95,7 @@ declaracao_global:
 	TK_IDENTIFIER ':' tipo ';' { $$ = astree_create(AST_GVARDEC,$1,$3,0,0,0); }
 	| TK_IDENTIFIER ':' tipo '[' LIT_INTEGER ']' ';' { $$ = astree_create(AST_GVECDEC,0,$1,$3,$5,0); } 
 	;		
-tipo:				
+tipo:
 	KW_INT { $$ = astree_create(AST_INT,0,0,0,0,0); }
 	| KW_FLOAT { $$ = astree_create(AST_FLOA,0,0,0,0,0); }
 	| KW_CHAR { $$ = astree_create(AST_CHAR,0,0,0,0,0); }

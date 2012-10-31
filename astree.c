@@ -201,10 +201,11 @@ char * insereTabulacao(int level) {
 	}
 }
 
-void imprimeNodo(ASTREE arvore,FILE * file) {
+void imprimeNodo(ASTREE* arvore,FILE * file) {
 	puts(getNodeString(arvore->type));
-	for (int i = 0; i < 4; ++i) {
-		imprimeNodo(arvore->sons[i]);
+	int i;
+	for (i = 0; i < 4; ++i) {
+		imprimeNodo(arvore->sons[i],file);
 	}
 }
 
@@ -215,12 +216,12 @@ void astree_toFile(ASTREE*arvore,  char* filenName) {
 }
 
 void astree_exibe(ASTREE* arvore, int level) {
-	if (arvore != NULL) {
+	if (arvore != NULL) 
+	{
 		int i;
 		printf("%s%s\n",insereTabulacao(level),selecionaMensagemPorTipo(arvore->type));
 		int nextLevel= ++level;
-		for (i = 0; i < 4; ++i) {
+		for (i = 0; i < 4; ++i) 
 			astree_exibe(arvore->sons[i], nextLevel);
-		}
 	}
 }

@@ -1,21 +1,15 @@
-/*
+b: bool[1];
+a: int;
 
-
-
-*/
-
-
-&555 *** $
-10.2;
-102;
-/// comentario
-"ola mundo";
-
-'a'
-
-int x
-.1
-1.
-23.0
-
-wqe.2.8
+a: int( c: int , d: bool)
+e: int;
+f: char;
+g: float;
+{
+	while (1) return b;
+	return a+b;
+	output "a",b;
+	if (true) then	return a;
+	if (false) then input y else input z;
+	input x;
+};

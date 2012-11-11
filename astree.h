@@ -3,66 +3,24 @@
 
 #include "m_hash.h"
 
+#define ASTN_ 1
+#define ASTN_VAD 2
+#define ASTN_IT 3
+#define ASTN_FT 4
+#define ASTN_BT 5
+#define ASTN_CT 6
+#define ASTN_VED 7
+#define ASTN_IV 8
+#define ASTN_LIST 9
+#define ASTN_FUNCTION 10
+#define ASTN_HEADER 11
+#define ASTN_INPUT 12
+#define ASTN_OUTPUT 13
+#define ASTN_RETURN 14
+#define ASTN_ASSIGNMENT 15
+#define ASTN_IF 16
+#define ASTN_WHILE 17
 
-#define AST_SYMBOL 			0
-#define AST_PROGRAM 		1
-#define AST_LDAN 			2
-#define AST_DAN 			3
-#define AST_DG	 			4
-#define AST_TIPO			5
-#define AST_FUNCAO			6
-#define AST_CAB				7
-#define AST_LPAR			8
-#define AST_PAR				9
-#define AST_LDEC			10
-#define AST_BCOM			11
-#define AST_COM				12
-#define AST_LCOM			13
-#define AST_COMV			14
-#define AST_COMS			16
-#define AST_ESQ				17
-#define AST_INPUT			18
-#define AST_OUTPUT			19
-#define AST_RETURN			20
-#define AST_LSTELEM 		21
-#define AST_ELEM 			22
-#define AST_GVARDEC 		23
-#define AST_GVECDEC 		24
-#define AST_ADD 			25
-#define AST_SUB 			26
-#define AST_MUL 			27
-#define AST_DIV 			28
-#define AST_INT 			29
-#define AST_FLOA 			30
-#define AST_CHAR 			31
-#define AST_BOOL 			32
-#define AST_IF				33
-#define AST_IFEL			34
-#define AST_WHILE			35
-#define AST_ATTRIB			36
-#define AST_ESQVAR			40
-#define AST_ESQVEC			41
-#define AST_CALL			42
-#define AST_VAR				43
-#define AST_VEC				44
-#define AST_LSTEXPR 		45
-#define AST_EXPRS 			46
-#define AST_EXPR 			47
-
-// ?????
-#define AST_CV 				50
-#define AST_LSTEXPRS		51
-#define AST_LE				52
-#define AST_GE		 		53
-#define AST_EQ	 			54
-#define AST_NE	 			55
-#define AST_AND				56
-#define AST_OR				57
-#define AST_MINUS	 		58
-#define AST_MULT 			59
-#define AST_LT	 			60
-#define AST_PAREXP			61
-#define AST_GT				62
 
 typedef struct _ASTREE ASTREE;
 
@@ -76,6 +34,15 @@ struct _ASTREE {
 ASTREE* ast;
 
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
+
+ASTREE * astree_create_symbol(int type, HASH_NODE* symbol);
+
+ASTREE * astree_create_default(int type, ASTREE * son1);
+
+ASTREE * astree_create_basic(int type, HASH_NODE* symbol,ASTREE * son1);
+
+ASTREE * astree_create_empty(int type);
+
 
 void astree_exibe(ASTREE* arvore, int level);
 

@@ -73,7 +73,7 @@ int yyerror(char *);
 %%
 
 program:
-	high_lvl_statements 	{  astree_exibe($$,0); }// astree_toFile($$,"tmp1.tmp");	}
+	high_lvl_statements 	{  astree_exibe_botton_up($$,0); }// astree_toFile($$,"tmp1.tmp");	}
 	| { $$ = 0 ;}
 	;
 

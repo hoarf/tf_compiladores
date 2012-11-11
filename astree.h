@@ -46,6 +46,8 @@ ASTREE * astree_create_empty(int type);
 
 void astree_exibe(ASTREE* arvore, int level);
 
+void astree_exibe_botton_up(ASTREE* arvore, int level);
+
 void astree_toFile(ASTREE* arvore,const char* filenName);
 
 #endif /* ASTREE_H_ */

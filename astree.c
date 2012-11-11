@@ -105,6 +105,17 @@ void astree_exibe(ASTREE* arvore, int level) {
 			astree_exibe(arvore->sons[i], nextLevel);
 	}
 }
+void astree_exibe_botton_up(ASTREE* arvore, int level) {
+	if (arvore != NULL) 
+	{
+		int i;
+		int nextLevel= ++level;
+		for (i = 0; i < 4; ++i) 
+			astree_exibe(arvore->sons[i], nextLevel);
+		printf("%s%s\n",insereTabulacao(level),selecionaMensagemPorTipo(arvore->type));
+		
+	}
+}
 const char * selecionaMensagemPorTipo(int tipo) {
 	switch (tipo) {
 		case ASTN_VAD:

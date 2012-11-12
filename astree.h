@@ -20,6 +20,22 @@
 #define ASTN_ASSIGNMENT 15
 #define ASTN_IF 16
 #define ASTN_WHILE 17
+#define ASTN_SYMBOL 18
+#define ASTN_FUNCALL 20
+#define ASTN_SYMBOL_VAR 19
+#define ASTN_SYMBOL_VEC 33
+#define ASTN_OP_ADD 21
+#define ASTN_OP_SUB 22
+#define ASTN_OP_MUL 23
+#define ASTN_OP_DIV 24
+#define ASTN_OP_EQ 25
+#define ASTN_OP_NE 26
+#define ASTN_OP_GT 27
+#define ASTN_OP_LT 28
+#define ASTN_OP_OR 29
+#define ASTN_OP_AND 30
+#define ASTN_OP_LE 31
+#define ASTN_OP_GE 32
 
 
 typedef struct _ASTREE ASTREE;

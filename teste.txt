@@ -8,8 +8,8 @@ g: float;
 {
 	while (1) return b;
 	return a+b;
-	output "a",b;
+	output b;
 	if (true) then	return a;
 	if (false) then input y else input z;
-	input x;
+	input x
 };

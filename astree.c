@@ -117,7 +117,15 @@ void astree_exibe_botton_up(ASTREE* arvore, int level) {
 	}
 }
 const char * selecionaMensagemPorTipo(int tipo) {
-	switch (tipo) {
+	switch (tipo) {	
+		case ASTN_SYMBOL:
+			return "symbol";
+		case ASTN_FUNCALL:
+			return "function call";
+		case ASTN_SYMBOL_VAR:
+			return "variavel";
+		case ASTN_SYMBOL_VEC:
+			return "vetor";
 		case ASTN_VAD:
 			return "VAD";
 		case ASTN_VED:

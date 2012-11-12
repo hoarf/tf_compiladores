@@ -110,7 +110,7 @@ void astree_exibe(ASTREE* arvore, int level) {
 			astree_exibe(arvore->sons[i], nextLevel);
 	}
 }
-void astree_exibe_botton_up(ASTREE* arvore, int level) {
+void astree_exibe_bottom_up(ASTREE* arvore, int level) {
 	if (arvore != NULL) 
 	{
 		int i;
@@ -119,6 +119,35 @@ void astree_exibe_botton_up(ASTREE* arvore, int level) {
 			astree_exibe(arvore->sons[i], nextLevel);
 		printf("%s%s\n",insereTabulacao(level),selecionaMensagemPorTipo(arvore->type));
 		
+	}
+}
+void astree_seek_dec_var(ASTREE* arvore, HASH_NODE* symbol) {		
+	if (arvore != NULL)
+	{				    
+		if (arvore->type == ASTN_VAD)
+		{
+			if (strcmp(symbol->value, arvore->symbol->value))	
+			{		
+				printf("declarada: %s\n", symbol->value);
+				return;
+			}
+		}
+		int i;
+		for (i = 0; i < 4; ++i)
+			astree_seek_dec_var(arvore->sons[i], symbol);			
+	}
+}
+void astree_sem_dec_var(ASTREE* arvore, ASTREE* topo) {
+	if (arvore != NULL)
+	{				    
+		if (arvore->type == ASTN_SYMBOL_VAR)
+		{
+			printf("buscando: %s\n", arvore->symbol->value);
+			astree_seek_dec_var(topo, arvore->symbol);
+		}	
+		int i;
+		for (i = 0; i < 4; ++i)
+			astree_sem_dec_var(arvore->sons[i], topo);			
 	}
 }
 const char * selecionaMensagemPorTipo(int tipo) {

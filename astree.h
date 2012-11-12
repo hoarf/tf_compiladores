@@ -48,6 +48,7 @@ struct _ASTREE {
 } ;
 
 ASTREE* ast;
+ASTREE* top_node;
 
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
 

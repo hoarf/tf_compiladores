@@ -9,6 +9,11 @@
 const char * selecionaMensagemPorTipo(int tipo);
 const char * getNodeString(int tipo);
 
+void check_declarations(ASTREE * root);
+void check_usage(ASTREE * root);
+void check_data_types(ASTREE * root);
+void check_argument_matching(ASTREE * root);
+
 //End Private Prototypes
 
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4) {
@@ -159,6 +164,18 @@ const char * selecionaMensagemPorTipo(int tipo) {
 		default:
 			return "????";
 	}
+}
+
+
+const ASTREE * gRoot;
+
+void astree_check_semanthics(ASTREE * root) {
+	gRoot = root;
+
+	check_declarations(root);
+	check_usage(root);
+	check_data_types(root);
+	check_argument_matching(root);
 }
 
 const char * getNodeString(int tipo) {

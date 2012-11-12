@@ -47,7 +47,8 @@ struct _ASTREE {
 
 } ;
 
-ASTREE* ast;
+
+void astree_check_semanthics(ASTREE * tree);
 
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
 

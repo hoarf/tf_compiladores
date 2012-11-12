@@ -75,7 +75,7 @@ int yyerror(char *);
 %%
 
 program:
-	high_lvl_statements 					{ astree_exibe($$,0); }// astree_toFile($$,"tmp1.tmp");	}
+	high_lvl_statements 					{ astree_exibe($$,0); astree_check_semanthics($$); }	}
 	| 										{ $$ = 0 ;}
 	;
 

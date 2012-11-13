@@ -14,7 +14,7 @@ HASH_NODE * insertNode(const char* value, int type) {
 		HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
 		nodo->type = type;
 		nodo->value = calloc(strlen(value)+1,sizeof(char));
-		nodo->usage_type = -1;
+		nodo->usage_type = SYMBOL_USAGE_TYPE_UNUSED;
 		strcpy(nodo->value, value);
 		nodo->next = NULL;
 		nodo->next = tabela[address];

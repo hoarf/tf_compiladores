@@ -205,17 +205,33 @@ void astree_check_semantics(ASTREE * tree) {
 	//print();
 }
 
+char* get_usage_type_name(int t)
+{
+	switch (t)
+	{
+		case SYMBOL_USAGE_TYPE_FUNCTION:
+			return "função";			
+		case SYMBOL_USAGE_TYPE_VARIABLE:
+			return "variável";
+		case SYMBOL_USAGE_TYPE_VECTOR:
+			return "vetor";
+		default:
+			return "erro";
+	}	
+}
+
 void check_declarations_and_usage(ASTREE * root){
 	if (root != NULL) {
-
 		int i;
-
-		if (root->symbol != NULL &&  root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED) {
-
+		if (root->symbol != NULL && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED) {
 			if (root->type == ASTN_VAD) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
 			if (root->type == ASTN_VED) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VECTOR;
 			if (root->type == ASTN_HEADER) root->symbol->usage_type = SYMBOL_USAGE_TYPE_FUNCTION;
 		}	
+		else if (root->symbol != NULL && root->symbol->usage_type != SYMBOL_USAGE_TYPE_UNUSED)
+		{			
+			printf("Simbolo %s já declarado\n", root->symbol->value);
+		}
 		for (i=0;i<4;++i)
 			check_declarations_and_usage(root->sons[i]);	
 
@@ -223,7 +239,7 @@ void check_declarations_and_usage(ASTREE * root){
 			if ((root->type == ASTN_SYMBOL_VAR || root->type == ASTN_INPUT) && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED)
 				printf("Simbolo %s não declarado. \n", root->symbol->value);
 			else if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
-				printf("Simbolo %s usado como variável, mas declarado como outro tipo. \n", root->symbol->value);
+				printf("Simbolo %s usado como variável, mas declarado como %s \n", root->symbol->value, get_usage_type_name(root->symbol->usage_type));
 		}
 	}
 }

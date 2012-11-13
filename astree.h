@@ -36,7 +36,8 @@
 #define ASTN_OP_AND 30
 #define ASTN_OP_LE 31
 #define ASTN_OP_GE 32
-
+#define ASTN_EXP_OP 34
+#define ASTN_EXP 35
 
 typedef struct _ASTREE ASTREE;
 

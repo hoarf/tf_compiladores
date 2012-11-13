@@ -21,11 +21,20 @@
 #define SYMBOL_USAGE_TYPE_VECTOR 2
 #define SYMBOL_USAGE_TYPE_UNUSED 3
 
+#define HASH_DATA_TYPE_INT 0
+#define HASH_DATA_TYPE_FLOAT 1
+#define HASH_DATA_TYPE_CHAR 2
+#define HASH_DATA_TYPE_BOOL 3
+#define HASH_DATA_TYPE_UNDEFINED 4
+
+
+
 typedef struct _Hash_Node HASH_NODE;
 
 struct _Hash_Node {
 	char * value;
 	int type;
+	int data_type;
 	int usage_type;
 	HASH_NODE * next;
 };

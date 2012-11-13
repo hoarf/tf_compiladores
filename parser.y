@@ -75,7 +75,7 @@ int yyerror(char *);
 %%
 
 program:
-	high_lvl_statements 					{ astree_exibe($$,0); astree_check_semantics($$);}	
+	high_lvl_statements 					{ /*astree_exibe($$,0);*/ astree_check_semantics($$);}	
 	| 										{ $$ = 0 ;}
 	;
 
@@ -180,32 +180,32 @@ expressoes:
 	;
 
 expressao:
-	expressao op expressao 				{ $$ = astree_create(ASTN_,NULL,$1,$2,$3,NULL); } 					
-	| '(' expressao ')' 				{ $$ = astree_create_default(ASTN_,$2); }
+	expressao op expressao 					{ $$ = astree_create(ASTN_EXP_OP,NULL,$1,$2,$3,NULL); } 					
+	| '(' expressao ')' 					{ $$ = astree_create_default(ASTN_EXP,$2); }
 	| TK_IDENTIFIER '(' expressoes ')' 		{ $$ = astree_create_basic(ASTN_FUNCALL, $1, $3); }
-	| TK_IDENTIFIER 				{ $$ = astree_create_symbol(ASTN_SYMBOL_VAR, $1); }
+	| TK_IDENTIFIER 						{ $$ = astree_create_symbol(ASTN_SYMBOL_VAR, $1); }
 	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_SYMBOL_VEC, $1,$3); }
-	| LIT_INTEGER 					{ $$ = astree_create_symbol(ASTN_IV, $1); }
-	| LIT_FLOA 					{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_TRUE 					{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_FALSE 					{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_CHAR 					{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_STRING 					{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_INTEGER 							{ $$ = astree_create_symbol(ASTN_IV, $1); }
+	| LIT_FLOA 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_TRUE 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_FALSE 							{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_CHAR 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_STRING 							{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
 	;
 
 op:
-	'+' 						{ $$ = astree_create_empty(ASTN_OP_ADD);}
-	| '-' 						{ $$ = astree_create_empty(ASTN_OP_SUB);}
-	| '/' 						{ $$ = astree_create_empty(ASTN_OP_DIV);}
-	| '*' 						{ $$ = astree_create_empty(ASTN_OP_MUL);}
-	| '<' 						{ $$ = astree_create_empty(ASTN_OP_LT);}
-	| '>' 						{ $$ = astree_create_empty(ASTN_OP_GT);}
-	| OPERATOR_OR 					{ $$ = astree_create_empty(ASTN_OP_OR);}
-	| OPERATOR_AND 					{ $$ = astree_create_empty(ASTN_OP_AND);}
-	| OPERATOR_NE 					{ $$ = astree_create_empty(ASTN_OP_NE);}
-	| OPERATOR_EQ 					{ $$ = astree_create_empty(ASTN_OP_EQ);}
-	| OPERATOR_LE 					{ $$ = astree_create_empty(ASTN_OP_LE);}
-	| OPERATOR_GE 					{ $$ = astree_create_empty(ASTN_OP_GE);}
+	'+' 									{ $$ = astree_create_empty(ASTN_OP_ADD);}
+	| '-' 									{ $$ = astree_create_empty(ASTN_OP_SUB);}
+	| '/' 									{ $$ = astree_create_empty(ASTN_OP_DIV);}
+	| '*' 									{ $$ = astree_create_empty(ASTN_OP_MUL);}
+	| '<' 									{ $$ = astree_create_empty(ASTN_OP_LT);}
+	| '>' 									{ $$ = astree_create_empty(ASTN_OP_GT);}
+	| OPERATOR_OR 							{ $$ = astree_create_empty(ASTN_OP_OR);}
+	| OPERATOR_AND 							{ $$ = astree_create_empty(ASTN_OP_AND);}
+	| OPERATOR_NE 							{ $$ = astree_create_empty(ASTN_OP_NE);}
+	| OPERATOR_EQ 							{ $$ = astree_create_empty(ASTN_OP_EQ);}
+	| OPERATOR_LE 							{ $$ = astree_create_empty(ASTN_OP_LE);}
+	| OPERATOR_GE 							{ $$ = astree_create_empty(ASTN_OP_GE);}
 
 %%
 

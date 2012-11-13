@@ -12,7 +12,8 @@ const char * getNodeString(int tipo);
 void check_declarations_and_usage(ASTREE * root);
 void check_data_types(ASTREE * root);
 void check_argument_matching(ASTREE * root);
-void lookFor(int type, char* value);
+int getDataTypeByNodeType(int nodeType);
+int isExpressionOfType(int type, ASTREE * expressionNode); 
 
 //End Private Prototypes
 
@@ -190,6 +191,10 @@ const char * selecionaMensagemPorTipo(int tipo) {
 			return "output";
 		case ASTN_RETURN:
 			return "return";
+		case ASTN_EXP_OP:
+			return "binary op";
+		case ASTN_EXP:
+			return "( exp )";
 		default:
 			return "????";
 	}
@@ -224,7 +229,10 @@ void check_declarations_and_usage(ASTREE * root){
 	if (root != NULL) {
 		int i;
 		if (root->symbol != NULL && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED) {
-			if (root->type == ASTN_VAD) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
+			if (root->type == ASTN_VAD || root->type == ASTN_VED ) {
+				root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
+				root->symbol->data_type = getDataTypeByNodeType(root->sons[0]->type);
+			}
 			if (root->type == ASTN_VED) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VECTOR;
 			if (root->type == ASTN_HEADER) root->symbol->usage_type = SYMBOL_USAGE_TYPE_FUNCTION;
 		}	
@@ -232,16 +240,48 @@ void check_declarations_and_usage(ASTREE * root){
 		{			
 			printf("Simbolo %s já declarado\n", root->symbol->value);
 		}
+		
+		// vvvvvv top-down 
+		//=============================================================================
 		for (i=0;i<4;++i)
 			check_declarations_and_usage(root->sons[i]);	
+		//=============================================================================
+		// ^^^^^^ botton-up
 
-		if (root != NULL) {
-			if ((root->type == ASTN_SYMBOL_VAR || root->type == ASTN_INPUT) && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED)
-				printf("Simbolo %s não declarado. \n", root->symbol->value);
-			else if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
+		if ((root->type == ASTN_SYMBOL_VAR || root->type == ASTN_INPUT) && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED)
+			printf("Simbolo %s não declarado. \n", root->symbol->value);
+		else 
+			if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
 				printf("Simbolo %s usado como variável, mas declarado como %s \n", root->symbol->value, get_usage_type_name(root->symbol->usage_type));
-		}
+		else 
+			if (root->type == ASTN_SYMBOL_VEC && !isExpressionOfType(HASH_DATA_TYPE_INT, root->sons[0]))  
+				printf("Indice do vetor deve ser inteiro. %s\n", root->symbol->value);
 	}
+}
+
+
+int getDataTypeByNodeType(int nodeType) {
+	switch (nodeType) {
+		case ASTN_IT:
+			return HASH_DATA_TYPE_INT;
+		case ASTN_FT:
+			return HASH_DATA_TYPE_FLOAT;
+		case ASTN_BT:
+			return HASH_DATA_TYPE_BOOL;
+		case ASTN_CT:
+			return HASH_DATA_TYPE_CHAR;
+		default:
+			return -1;
+	}
+}
+
+
+int isExpressionOfType(int type, ASTREE * expressionNode) {
+// 	if (expressionNode->sons[0] || expressionNode->type ) {
+
+// 	} else {
+// //		return type == expressionNode->symbol->data_type;
+// 	}
 }
 
 const char * getNodeString(int tipo) {

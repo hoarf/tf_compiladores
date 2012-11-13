@@ -9,10 +9,10 @@
 const char * selecionaMensagemPorTipo(int tipo);
 const char * getNodeString(int tipo);
 
-void check_declarations(ASTREE * root);
-void check_usage(ASTREE * root);
+void check_declarations_and_usage(ASTREE * root);
 void check_data_types(ASTREE * root);
 void check_argument_matching(ASTREE * root);
+void lookFor(int type, char* value);
 
 //End Private Prototypes
 
@@ -198,13 +198,28 @@ const char * selecionaMensagemPorTipo(int tipo) {
 
 const ASTREE * gRoot;
 
-void astree_check_semanthics(ASTREE * root) {
-	gRoot = root;
+void astree_check_semantics(ASTREE * tree) {
+	//gRoot = tree;
+	check_declarations_and_usage(tree);
+}
 
-	check_declarations(root);
-	check_usage(root);
-	check_data_types(root);
-	check_argument_matching(root);
+void check_declarations_and_usage(ASTREE * root){
+	if (root != NULL) {
+		int i;
+		if (root->type == ASTN_VAD) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
+		if (root->type == ASTN_VED) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VECTOR;
+		if (root->type == ASTN_HEADER) root->symbol->usage_type = SYMBOL_USAGE_TYPE_FUNCTION;
+		
+		for (i=0;i<4;++i)
+			check_declarations_and_usage(root->sons[i]);	
+
+		if (root != NULL) {
+			if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type == -1)
+				printf("Simbolo %s não declarado. \n", root->symbol->value);
+			else if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
+				printf("Simbolo %s declarado como variável, mas usado como outro tipo. \n", root->symbol->value);
+		}
+	}
 }
 
 const char * getNodeString(int tipo) {

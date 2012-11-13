@@ -75,12 +75,12 @@ int yyerror(char *);
 %%
 
 program:
-	high_lvl_statements 					{ astree_exibe($$,0); astree_check_semanthics($$); }	}
+	high_lvl_statements 					{ astree_exibe($$,0); astree_check_semantics($$);}	
 	| 										{ $$ = 0 ;}
 	;
 
 high_lvl_statements:
-	high_lvl_statements high_lvl_statement 	{ $$ = astree_create(ASTN_LIST, NULL, $1, $2, NULL, NULL); top_node = $$; }
+	high_lvl_statements high_lvl_statement 	{ $$ = astree_create(ASTN_LIST, NULL, $1, $2, NULL, NULL);}
 	| high_lvl_statement 
 	;
 
@@ -91,7 +91,8 @@ high_lvl_statement:
 
 global_var_dec:
 	TK_IDENTIFIER ':' tipo  				{ $$ =  astree_create_basic(ASTN_VAD, $1, $3); }
-	| TK_IDENTIFIER ':' tipo '[' tipo_cont ']' 		{ $$ = astree_create(ASTN_VED, $1, $3, $5,NULL, NULL); }
+	| TK_IDENTIFIER ':' tipo '[' tipo_cont ']' 		
+											{ $$ = astree_create(ASTN_VED, $1, $3, $5,NULL, NULL); }
 	;
 	
 tipo_cont:

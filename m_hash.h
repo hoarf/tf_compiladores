@@ -16,11 +16,16 @@
 #define SYMBOL_LIT_STRING	6
 #define SYMBOL_IDENTIFIER	7
 
+#define SYMBOL_USAGE_TYPE_FUNCTION 0
+#define SYMBOL_USAGE_TYPE_VARIABLE 1
+#define SYMBOL_USAGE_TYPE_VECTOR 2
+
 typedef struct _Hash_Node HASH_NODE;
 
 struct _Hash_Node {
 	char * value;
 	int type;
+	int usage_type;
 	HASH_NODE * next;
 };
 

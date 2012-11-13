@@ -10,14 +10,18 @@ int getAddress(const char* value) {
 
 HASH_NODE * insertNode(const char* value, int type) {
 	int address = getAddress(value);
-	HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
-	nodo->type = type;
-	nodo->value = calloc(strlen(value)+1,sizeof(char));
-	strcpy(nodo->value, value);
-	nodo->next = NULL;
-	nodo->next = tabela[address];
-	tabela[address] = nodo;
-	return nodo;
+	if (tabela[address] == NULL) {
+		HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
+		nodo->type = type;
+		nodo->value = calloc(strlen(value)+1,sizeof(char));
+		nodo->usage_type = -1;
+		strcpy(nodo->value, value);
+		nodo->next = NULL;
+		nodo->next = tabela[address];
+		tabela[address] = nodo;
+	}
+	
+	return tabela[address];
 }
 
 void initMe(void) {
@@ -33,7 +37,7 @@ void print(void) {
 		if (tabela[i] != NULL) {
 			HASH_NODE * node = tabela[i];
 			while (node != NULL) {
-				printf("P: %d V: %s T: %d\n",i, node->value,node->type);
+				printf("P: %d V: %s T: %d UT: %i\n",i, node->value,node->type, node->usage_type);
 				node = node->next;
 			}
 		}

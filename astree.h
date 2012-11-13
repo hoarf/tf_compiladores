@@ -47,9 +47,6 @@ struct _ASTREE {
 
 } ;
 
-
-void astree_check_semanthics(ASTREE * tree);
-
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4);
 
 ASTREE * astree_create_symbol(int type, HASH_NODE* symbol);
@@ -60,8 +57,9 @@ ASTREE * astree_create_basic(int type, HASH_NODE* symbol,ASTREE * son1);
 
 ASTREE * astree_create_empty(int type);
 
-
 void astree_exibe(ASTREE* arvore, int level);
+
+void astree_check_semantics(ASTREE * tree);
 
 void astree_exibe_bottom_up(ASTREE* arvore, int level);
 

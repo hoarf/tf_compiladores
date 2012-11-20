@@ -11,7 +11,8 @@ int yyerror(char *);
 
 %}
 
-%union {
+%union 
+{
 	 HASH_NODE * symbol;
 	 struct _ASTREE * ast;
 }
@@ -66,7 +67,6 @@ int yyerror(char *);
 %type <ast>command_archetype
 %type <ast>command_block
 %type <ast>op
-%type <ast>empty_command
 
 %left OPERATOR_LE  OPERATOR_GE  OPERATOR_EQ  OPERATOR_NE  OPERATOR_AND OPERATOR_OR '<' '>'
 %left '-'  '+'
@@ -75,7 +75,10 @@ int yyerror(char *);
 %%
 
 program:
-	high_lvl_statements 					{ /*astree_exibe($$,0);*/ astree_check_semantics($$);}	
+	high_lvl_statements 					{ 
+												astree_exibe($$,0);
+												astree_check_semantics($$);
+											}	
 	| 										{ $$ = 0 ;}
 	;
 
@@ -118,31 +121,28 @@ cabecalho:
 
 lista_de_parametros:					
 	lista_de_parametros ',' TK_IDENTIFIER ':' tipo 
-											{ $$ = astree_create(ASTN_LIST, $3, $1 , $5 , NULL, NULL); }
+											{ $$ = astree_create(ASTN_LIST_ARG, $3, $1 , $5 , NULL, NULL); }
 	| TK_IDENTIFIER ':' tipo 				{ $$ = astree_create_basic(ASTN_VAD, $1, $3); }
 	| 										{ $$ = 0; }
 	;
 
 lista_declaracoes: 		
 	lista_declaracoes TK_IDENTIFIER ':' tipo ';'
-											{ $$ = astree_create(ASTN_LIST, $2, $1 , $4 , NULL, NULL); }
+											{ $$ = astree_create(ASTN_VAD, $2, $1 , $4 , NULL, NULL); }
 	| TK_IDENTIFIER ':' tipo ';' 			{ $$ = astree_create_basic(ASTN_VAD, $1, $3); }
 	| 										{ $$ = 0; }
 	;
 
 comandos:
-    | command_archetype ';' comandos  		{ $$ =  astree_create(ASTN_LIST, NULL, $1,$3,NULL,NULL); }
-	| command_archetype
+    command_archetype ';' comandos  		{ $$ =  astree_create(ASTN_LIST, NULL, $1,$3,NULL,NULL); }
+	| command_archetype						
 	; 
 
 command_archetype:
-	| command_block
-	| comando
-    | empty_command										
+	command_block														
+	| comando 								
+    | 										{ $$ = 0 ;}			
     ;
-
-empty_command:								{ $$ = 0 ;}
-	;
 
 command_block:
 	'{' comandos '}' 						{ $$ =  astree_create_default(ASTN_LIST, $2); }
@@ -161,21 +161,21 @@ comando:
 
 esquerda:					
 	TK_IDENTIFIER							{ $$ =  astree_create_symbol(ASTN_SYMBOL, $1); }
-	| TK_IDENTIFIER '[' expressao ']' 		{ $$ =  astree_create_basic(ASTN_,$1, $3); }
+	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_,$1, $3); }
 	;
 
 lista_de_elementos:	
-	lista_de_elementos ',' elemento 		{ $$ =  astree_create(ASTN_LIST, NULL, $1, $3, NULL,NULL); }
+	lista_de_elementos ',' elemento 		{ $$ = astree_create(ASTN_LIST, NULL, $1, $3, NULL,NULL); }
 	| elemento 
 	;
 
 elemento:					
-	LIT_STRING 								{ $$ =  astree_create_symbol(ASTN_SYMBOL, $1); }
+	LIT_STRING 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
 	| expressao 
 	;
 
 expressoes:
-	expressoes ',' expressao 				{ $$ =  astree_create(ASTN_LIST, NULL, $1,$3,NULL,NULL); }
+	expressoes ',' expressao 				{ $$ = astree_create(ASTN_LIST, NULL, $1,$3,NULL,NULL); }
 	| expressao  
 	;
 
@@ -186,11 +186,12 @@ expressao:
 	| TK_IDENTIFIER 						{ $$ = astree_create_symbol(ASTN_SYMBOL_VAR, $1); }
 	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_SYMBOL_VEC, $1,$3); }
 	| LIT_INTEGER 							{ $$ = astree_create_symbol(ASTN_IV, $1); }
-	| LIT_FLOA 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_TRUE 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_FALSE 							{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_CHAR 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
-	| LIT_STRING 							{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	| LIT_FLOA 								{ $$ = astree_create_symbol(ASTN_FV, $1); }
+	| LIT_TRUE 								{ $$ = astree_create_symbol(ASTN_BV, $1); }
+	| LIT_FALSE 							{ $$ = astree_create_symbol(ASTN_BV, $1); }
+	| LIT_CHAR 								{ $$ = astree_create_symbol(ASTN_CV, $1); }
+	| LIT_STRING 							{ $$ = astree_create_symbol(ASTN_SV, $1); }
+	|										{ $$ = 0 ;}
 	;
 
 op:
@@ -209,7 +210,8 @@ op:
 
 %%
 
-int yyerror(char* s) {
+int yyerror(char* s) 
+{
 	fprintf(stdout, "%s na linha %i\n", s,getLineNumber());
 	exit(3);
 }

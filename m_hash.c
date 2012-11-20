@@ -1,50 +1,89 @@
 #include "m_hash.h"
 
+int printList(CALL_LIST* list);
+
+
+int printList(CALL_LIST* list)
+{
+	if (list)
+	{
+		printf("Item %d\n", list->dataType);
+		printList(list->next);
+	}
+}
+
 /* fonte: http://research.cs.vt.edu/AVresearch/hashing/strings.php */
-int getAddress(const char* value) {
+int getAddress(const char* value) 
+{
 	int i, soma = 0;
 	for(i=0; i<strlen(value); ++i)
 		soma += value[i];
 	return soma % HASH_SIZE;
 }
 
-HASH_NODE * insertNode(const char* value, int type) {
+HASH_NODE * insertNode(const char* value, int type) 
+{
 	int address = getAddress(value);
 	HASH_NODE* tmpNode = tabela[address];
-	while (tmpNode != NULL) {
+	
+	while (tmpNode) 
+	{
 		if (strcmp(tmpNode->value, value) == 0) 
-			return tabela[address];
+			return tmpNode;
 		tmpNode = tmpNode->next;
 	}
+
 	HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
 	nodo->type = type;
 	nodo->value = calloc(strlen(value)+1,sizeof(char));
 	nodo->data_type = HASH_DATA_TYPE_UNDEFINED;
 	nodo->usage_type = SYMBOL_USAGE_TYPE_UNUSED;
+	nodo->list = NULL;
 	strcpy(nodo->value, value);
-	nodo->next = NULL;
 	nodo->next = tabela[address];
 	tabela[address] = nodo;
 	return tabela[address];
 }
 
-void initMe(void) {
+void initMe(void)
+{
 	int i;
-	for (i = 0; i < HASH_SIZE; ++i) {
+	for (i = 0; i < HASH_SIZE; ++i)
 		tabela[i] = NULL;
-	}
 }
 
-void print(void) {
+void print(void) 
+{
 	int i;
-	for (i = 0; i < HASH_SIZE; ++i) {
-		if (tabela[i] != NULL) {
+	printf("======= Tabela Hash ========================================================\n");
+	printf("Posição		Conteúdo	Tipo		Tipo de Uso	Tipo de dado	\n");
+	for (i = 0; i < HASH_SIZE; ++i) 
+	{
+		if (tabela[i] != NULL) 
+		{
 			HASH_NODE * node = tabela[i];
-			while (node != NULL) {
-				printf("P: %d V: %s T: %d UT: %i DT: %i\n",i, node->value,node->type, node->usage_type, node->data_type);
+			while (node != NULL) 
+			{
+				printf("%d\t\t%s\t\t%d\t\t%i\t\t%i\n",i, node->value,node->type, node->usage_type, node->data_type);
+				if (node->list) printList(node->list);
 				node = node->next;
 			}
 		}
 	}
 }
 
+HASH_NODE * makeTmp(void)
+{
+	static int nextTmp = 0; 
+	static char buffer[32] = ""; 
+	sprintf(buffer,"_mY_nEw_Temp%d",nextTmp++);
+	return insertNode(buffer,SYMBOL_VARIABLE);
+}
+
+HASH_NODE * makeLabel(void)
+{
+	static int nextLabel = 0; 
+	static char buffer[32] = ""; 
+	sprintf(buffer,"_mY_nEw_Temp%d",nextLabel++);
+	return insertNode(buffer,SYMBOL_LABEL);
+}

@@ -20,6 +20,7 @@ int isOperationArithmetic(int nodeType);
 int isOperationRelational(int nodeType);
 int isCallCompatible(CALL_LIST* list, ASTREE* node);
 int createParamList(ASTREE * node,ASTREE* son, int dataType);
+int isSymbolicItem(int type);
 
 //End Private Prototypes
 
@@ -209,15 +210,13 @@ void astree_check_semantics(ASTREE * tree) {
 	print();
 }
 
-
-
 void check_declarations_and_usage(ASTREE * root)
 {
 	if (root != NULL)
 	{
 		int i;
-		if (root->symbol)
-			root->symbol->data_type = getDataTypeByNodeType(root->type);
+		if (root->symbol && getDataTypeByNodeType(root->type) != HASH_DATA_TYPE_UNDEFINED)
+			 root->symbol->data_type = getDataTypeByNodeType(root->type);
 
 		if (root->symbol != NULL) 
 		{
@@ -225,13 +224,14 @@ void check_declarations_and_usage(ASTREE * root)
 				printf("Simbolo %s já declarado\n", root->symbol->value);
 			else 
 			{
-				if (root->type == ASTN_VAD || root->type == ASTN_VED ) 
-					{
-						root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
-						root->symbol->data_type = getDataTypeByNodeType(root->sons[0]->type);
-					}
+				if (root->type == ASTN_VAD)	root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
 				if (root->type == ASTN_VED) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VECTOR;
 				if (root->type == ASTN_HEADER) root->symbol->usage_type = SYMBOL_USAGE_TYPE_FUNCTION;
+				if ((root->type == ASTN_VAD) 	|| (root->type ==ASTN_VED))
+				{
+					root->symbol->data_type =  getDataTypeByNodeType(root->sons[1]?root->sons[1]->type:root->sons[0]->type);
+				}
+				if (root->type == ASTN_HEADER) root->symbol->data_type = getDataTypeByNodeType(root->sons[0]->type);
 			}
 			if (root->type == ASTN_HEADER && root->sons[1])
 			{
@@ -269,7 +269,7 @@ void check_declarations_and_usage(ASTREE * root)
 				int type1 = getExpressionType(root->sons[0]);
 				int type2 = getExpressionType(root->sons[2]);
 				if (!isOperationDefined(type1,root->sons[1]->type) || type1 != type2 )
-				 	printf("Operação não suportada para os tipos destes operadores\n"); 
+				 	printf("Operação não suportada para os tipos destes operadores %d e %d\n", type1,type2); 
 			}
 		else
 			if (root->type == ASTN_FUNCALL) 
@@ -278,8 +278,8 @@ void check_declarations_and_usage(ASTREE * root)
 				{	
 					printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);				 
 				}
-				else if (root->type == ASTN_FUNCALL && !isCallCompatible(root->symbol->list,root->sons[0]))
-					printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
+				else if (root->type == ASTN_FUNCALL & !isCallCompatible(root->symbol->list,root->sons[0]))
+				 	printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
 			}
 	}
 }
@@ -287,13 +287,30 @@ void check_declarations_and_usage(ASTREE * root)
 
 int isCallCompatible(CALL_LIST* list,ASTREE* item) 
 {
-	if (item->sons[1])
-		return  list && item->sons[1]->symbol->data_type == list->dataType &&
-				  isCallCompatible(list->next, item->sons[0]);
-	else	
-		return list && getDataTypeByNodeType( item->type) == list->dataType;  
+	if (isSymbolicItem(item->type))
+	{
+		if (item->sons[1])
+			return  list && item->sons[1]->symbol->data_type == list->dataType &&
+					   isCallCompatible(list->next, item->sons[0]);
+		else	
+			return list && getDataTypeByNodeType( item->type) == list->dataType;  
+	}
+	else
+	{
+		return isCallCompatible(list, item->sons[0]);
+	}
 }
+int isSymbolicItem(int type)
+{
+	switch (type)
+	{
+		case ASTN_EXP_OP:
+			return 0;
+		default:
+			return 1;
+	}
 
+}
 
 int createParamList(ASTREE * node, ASTREE* son, int dataType)
 {
@@ -379,7 +396,7 @@ int isOperationRelational(int nodeType)
 
 int isDeclarationType(int type)
 {
-	return type  == ASTN_VAD || type == ASTN_VED || type == ASTN_FUNCTION;
+	return (type  == ASTN_VAD) || (type == ASTN_VED) || (type == ASTN_HEADER);
 }
 
 

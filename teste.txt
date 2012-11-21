@@ -1,14 +1,14 @@
 b: bool[1];
-a: int;
+
 a: int(  k:int)
 x: int;
 y: char;
 z: float;
 {
 	while (1) return b[10];
-	return x+ 1;
+	return x + 1;
 	output b[3];
 	if (true) then x= 29;
-	if (a(2+3)) then input b else input z;
+	if (a(2)) then input b else input z;
 	input x
 };

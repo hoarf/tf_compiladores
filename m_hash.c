@@ -3,11 +3,24 @@
 int printList(CALL_LIST* list);
 
 
+HASH_NODE * fixedSymbol(int type)
+{
+	switch (type)
+	{
+		case SYMBOL_LIT_TRUE:
+			return insertNode("true",SYMBOL_LIT_TRUE);
+		case SYMBOL_LIT_FALSE:
+		  return insertNode("false",SYMBOL_LIT_FALSE);
+		 default:
+		 	return NULL;
+	}
+}
+
 int printList(CALL_LIST* list)
 {
 	if (list)
 	{
-		printf("Item %d\n", list->dataType);
+		printf("%i->", list->data_type);
 		printList(list->next);
 	}
 }
@@ -36,9 +49,9 @@ HASH_NODE * insertNode(const char* value, int type)
 	HASH_NODE * nodo = malloc(sizeof(HASH_NODE));
 	nodo->type = type;
 	nodo->value = calloc(strlen(value)+1,sizeof(char));
-	nodo->data_type = HASH_DATA_TYPE_UNDEFINED;
 	nodo->usage_type = SYMBOL_USAGE_TYPE_UNUSED;
 	nodo->list = NULL;
+	nodo->data_type = HASH_DATA_TYPE_UNDEFINED;
 	strcpy(nodo->value, value);
 	nodo->next = tabela[address];
 	tabela[address] = nodo;
@@ -56,7 +69,7 @@ void print(void)
 {
 	int i;
 	printf("======= Tabela Hash ========================================================\n");
-	printf("Posição		Conteúdo	Tipo		Tipo de Uso	Tipo de dado	\n");
+	printf("Posição		Conteúdo	Tipo		Tipo de Uso\n");
 	for (i = 0; i < HASH_SIZE; ++i) 
 	{
 		if (tabela[i] != NULL) 
@@ -64,8 +77,13 @@ void print(void)
 			HASH_NODE * node = tabela[i];
 			while (node != NULL) 
 			{
-				printf("%d\t\t%s\t\t%d\t\t%i\t\t%i\n",i, node->value,node->type, node->usage_type, node->data_type);
-				if (node->list) printList(node->list);
+				printf("%d\t\t%s\t\t%d\t\t%i\n",i, node->value,node->type, node->usage_type);
+				if (node->list){
+					printf("		|_>: ");
+					printList(node->list);
+					printf("\n");
+				} 
+					
 				node = node->next;
 			}
 		}
@@ -83,7 +101,7 @@ HASH_NODE * makeTmp(void)
 HASH_NODE * makeLabel(void)
 {
 	static int nextLabel = 0; 
-	static char buffer[32] = ""; 
-	sprintf(buffer,"_mY_nEw_Temp%d",nextLabel++);
-	return insertNode(buffer,SYMBOL_LABEL);
+	static char bufferlbl[32] = ""; 
+	sprintf(bufferlbl,"_mY_nEw_Label%d",nextLabel++);
+	return insertNode(bufferlbl,SYMBOL_LABEL);
 }

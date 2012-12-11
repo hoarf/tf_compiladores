@@ -34,7 +34,7 @@ typedef struct _Call_List CALL_LIST;
 
 struct _Call_List 
 {
-	int dataType;
+	int data_type;
 	CALL_LIST * next;
 };
 
@@ -42,8 +42,8 @@ struct _Hash_Node
 {
 	char * value;
 	int type;
-	int data_type;
 	int usage_type;
+	int data_type;
 	CALL_LIST * list;
 	HASH_NODE * next;
 };
@@ -52,10 +52,18 @@ int getAddress(const char* value);
 
 void print(void);
 void initMe(void);
+HASH_NODE * fixedSymbol(int type);
 
-HASH_NODE* makeTemp(void);
+HASH_NODE* makeTmp(void);
 HASH_NODE* tabela[HASH_SIZE];
 HASH_NODE * insertNode(const char* value, int type);
 HASH_NODE* makeLabel(void);
+
+
+int display_ast;
+int display_tac;
+int display_symbol;
+
+
 
 #endif /* M_HASH_H_ */

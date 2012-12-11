@@ -1,14 +1,27 @@
-b: bool[1];
+g_1: bool[10];
+g_2: char;	
 
-a: int(  k:int)
-x: int;
-y: char;
-z: float;
+f_1: int( p_1:int, p_2: char, p_3: bool)
+	l_1: int;
+	l_2: char;
+	l_3: float;
 {
-	while (1) return b[10];
-	return x + 1;
-	output b[3];
-	if (true) then x= 29;
-	if (a(2)) then input b else input z;
-	input x
+	l_1 = 10;
+	//return f_1(1,2,3);
+
+
+	// l_1 = 10;
+	// while (true) return b[5];
+	// return g_1 + 1;a
+	// output b[3], "ok";
+	// if (p_1 == 1) then return true else return false; 
+	// if (f_1(2)) then input l_2 else input l_3;
+	// input g_2 
 };
+
+/*
+foo: int()
+{
+	input g_2;	
+};
+*/

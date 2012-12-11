@@ -4,6 +4,7 @@
 #include "m_hash.h"
 
 #define ASTN_ 			1
+#define ASTN_STATEMENT_LIST 			100
 #define ASTN_VAD 		2
 #define ASTN_IT 		3
 #define ASTN_FT 		4
@@ -14,7 +15,7 @@
 #define ASTN_FV 		81
 #define ASTN_CV 		82
 #define ASTN_SV 		84
-#define ASTN_BV 		83
+#define ASTN_BV 		85
 #define ASTN_LIST 		9
 #define ASTN_FUNCTION 	10
 #define ASTN_HEADER 	11
@@ -24,7 +25,6 @@
 #define ASTN_ASSIGNMENT 15
 #define ASTN_IF 		16
 #define ASTN_WHILE 		17
-#define ASTN_SYMBOL 	18
 #define ASTN_FUNCALL 	20
 #define ASTN_SYMBOL_VAR 19
 #define ASTN_SYMBOL_VEC 33
@@ -42,7 +42,6 @@
 #define ASTN_OP_GE 		32
 #define ASTN_EXP_OP 	34
 #define ASTN_EXP 		35
-#define ASTN_LIST_ARG	36
 
 typedef struct _ASTREE ASTREE;
 
@@ -50,6 +49,8 @@ struct _ASTREE
 {
 	int type;
 	ASTREE* sons[4];
+	int data_type;
+	int lineNumber;
 	HASH_NODE * symbol;
 } ;
 

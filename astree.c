@@ -5,9 +5,9 @@
 
 //Private prototypes
 
+int isUsageNotComaptible(ASTREE* root);
+void fetchTypeFromSons(ASTREE* node);
 const char * selecionaMensagemPorTipo(int tipo);
-const char * getNodeString(int tipo);
-
 void check_declarations_and_usage(ASTREE * root);
 void check_data_types(ASTREE * root);
 void check_argument_matching(ASTREE * root);
@@ -18,9 +18,11 @@ int isDeclarationType(int type);
 int isOperationLogical(int nodeType);
 int isOperationArithmetic(int nodeType);
 int isOperationRelational(int nodeType);
-int isCallCompatible(CALL_LIST* list, ASTREE* node);
-int createParamList(ASTREE * node,ASTREE* son, int dataType);
+int isOperationNotDefined(int dataType, int nodeType);
+int isCallNotCompatible(ASTREE* node,CALL_LIST* list);
+void createParamList(ASTREE * node, ASTREE* son);
 int isSymbolicItem(int type);
+int getUsageType(int type);
 
 //End Private Prototypes
 
@@ -29,6 +31,8 @@ ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, A
 	ASTREE* ast = (ASTREE*) malloc(sizeof(ASTREE));
 	ast->symbol = symbol;
 	ast->type = type;
+	ast->data_type = HASH_DATA_TYPE_UNDEFINED;
+	ast->lineNumber = getLineNumber();
 	ast->sons[0] = son1;
 	ast->sons[1] = son2;
 	ast->sons[2] = son3;
@@ -42,7 +46,9 @@ ASTREE * astree_create_symbol(int type, HASH_NODE* symbol)
 	ast->symbol = symbol;
 	ast->type = type;
 	ast->sons[0] = 0;
+	ast->data_type = HASH_DATA_TYPE_UNDEFINED;
 	ast->sons[1] = 0;
+	ast->lineNumber = getLineNumber();
 	ast->sons[2] = 0;
 	ast->sons[3] = 0;
 	return ast;
@@ -56,6 +62,8 @@ ASTREE * astree_create_basic(int type, HASH_NODE* symbol,ASTREE * son1)
 	ast->sons[0] = son1;
 	ast->sons[1] = 0;
 	ast->sons[2] = 0;
+	ast->data_type = HASH_DATA_TYPE_UNDEFINED;
+	ast->lineNumber = getLineNumber();
 	ast->sons[3] = 0;
 	return ast;	
 }
@@ -67,7 +75,9 @@ ASTREE * astree_create_default(int type,ASTREE* son1)
 	ast->type = type;
 	ast->sons[0] = son1;
 	ast->sons[1] = 0;
+	ast->data_type = HASH_DATA_TYPE_UNDEFINED;
 	ast->sons[2] = 0;
+	ast->lineNumber = getLineNumber();
 	ast->sons[3] = 0;
 	return ast;
 }
@@ -79,7 +89,9 @@ ASTREE * astree_create_empty(int type)
 	ast->type = type;
 	ast->sons[0] = 0;
 	ast->sons[1] = 0;
+	ast->lineNumber = getLineNumber();
 	ast->sons[2] = 0;
+	ast->data_type = HASH_DATA_TYPE_UNDEFINED;
 	ast->sons[3] = 0;
 	return ast;
 }
@@ -97,30 +109,17 @@ char * insereTabulacao(int level)
 		return "";
 }
 
-void imprimeNodo(ASTREE* arvore,FILE * file) 
-{  
-	if (arvore) 
-	{
-		fprintf(file,"%s",getNodeString(arvore->type)); 
-		int i;
-		for (i = 0; i < 4; ++i) 
-			imprimeNodo(arvore->sons[i],file);
-	}
-}
-
-void astree_toFile(ASTREE*arvore, const char* filenName) 
-{
-	FILE * fp = fopen( filenName,  "w" );
-	imprimeNodo(arvore,fp);
-	fclose(fp);
-}
-
 void astree_exibe(ASTREE* arvore, int level) 
 {
 	if (arvore != NULL) 
 	{
 		int i;
-		printf("%s%s\n",insereTabulacao(level),selecionaMensagemPorTipo(arvore->type));
+		printf("%s%s",insereTabulacao(level),selecionaMensagemPorTipo(arvore->type));
+		if (arvore->data_type != HASH_DATA_TYPE_UNDEFINED) printf("(T: %d)",arvore->data_type);
+		if (arvore->symbol && arvore->symbol->data_type != HASH_DATA_TYPE_UNDEFINED) printf("(ST: %d)",arvore->symbol->data_type);
+		if (arvore->symbol) printf("(%s)",arvore->symbol->value);
+		if (isDeclarationType(arvore->type)) printf("*");
+		printf("\n");
 		int nextLevel= ++level;
 		for (i = 0; i < 4; ++i) 
 			astree_exibe(arvore->sons[i], nextLevel);
@@ -130,8 +129,8 @@ const char * selecionaMensagemPorTipo(int tipo)
 {
 	switch (tipo) 
 	{	
-		case ASTN_SYMBOL:
-			return "symbol";
+		case ASTN_ASSIGNMENT:
+			return "atribuicao";
 		case ASTN_FUNCALL:
 			return "function call";
 		case ASTN_SYMBOL_VAR:
@@ -146,6 +145,8 @@ const char * selecionaMensagemPorTipo(int tipo)
 			return "int";
 		case ASTN_FT:
 			return "float";
+		case ASTN_STATEMENT_LIST:
+			return "HL STMT";
 		case ASTN_CT:
 			return "char";
 		case ASTN_BT:
@@ -174,8 +175,6 @@ const char * selecionaMensagemPorTipo(int tipo)
 			return "output";
 		case ASTN_RETURN:
 			return "return";
-		case ASTN_LIST_ARG:
-			return "lista de argumentos";
 		case ASTN_EXP_OP:
 			return "binary op";
 		case ASTN_EXP:
@@ -186,7 +185,6 @@ const char * selecionaMensagemPorTipo(int tipo)
 }
 
 
-const ASTREE * gRoot;
 char* get_usage_type_name(int t)
 {
 	switch (t)
@@ -204,10 +202,23 @@ char* get_usage_type_name(int t)
 
 
 void astree_check_semantics(ASTREE * tree) {
-	//gRoot = tree;
-	// print();
 	check_declarations_and_usage(tree);
-	print();
+	if (display_symbol) print();
+}
+
+int getUsageType(int type)
+{
+	switch (type)
+	{
+		case ASTN_VAD:
+			return SYMBOL_USAGE_TYPE_VARIABLE;
+		case ASTN_VED:
+			return SYMBOL_USAGE_TYPE_VECTOR;
+		case ASTN_HEADER:
+			return SYMBOL_USAGE_TYPE_FUNCTION;
+		default:
+			return SYMBOL_USAGE_TYPE_UNUSED;
+	}
 }
 
 void check_declarations_and_usage(ASTREE * root)
@@ -215,36 +226,24 @@ void check_declarations_and_usage(ASTREE * root)
 	if (root != NULL)
 	{
 		int i;
-		if (root->symbol && getDataTypeByNodeType(root->type) != HASH_DATA_TYPE_UNDEFINED)
-			 root->symbol->data_type = getDataTypeByNodeType(root->type);
 
+		//ATRIBUI O TIPO DOS NODOS BASE
+		root->data_type = getDataTypeByNodeType(root->type);
+
+		//DEFINE O TIPO DE USO DE CADA SYMBOLO
 		if (root->symbol != NULL) 
 		{
-			if (root->symbol->usage_type != SYMBOL_USAGE_TYPE_UNUSED && (isDeclarationType(root->type)))
-				printf("Simbolo %s já declarado\n", root->symbol->value);
-			else 
+			if (root->symbol->usage_type != SYMBOL_USAGE_TYPE_UNUSED && isDeclarationType(root->type))
+				printf("Simbolo %s já declarado na linha %i\n", root->symbol->value, root->lineNumber);
+			else if (isDeclarationType(root->type))
 			{
-				if (root->type == ASTN_VAD)	root->symbol->usage_type = SYMBOL_USAGE_TYPE_VARIABLE;
-				if (root->type == ASTN_VED) root->symbol->usage_type = SYMBOL_USAGE_TYPE_VECTOR;
-				if (root->type == ASTN_HEADER) root->symbol->usage_type = SYMBOL_USAGE_TYPE_FUNCTION;
-				if ((root->type == ASTN_VAD) 	|| (root->type ==ASTN_VED))
-				{
-					root->symbol->data_type =  getDataTypeByNodeType(root->sons[1]?root->sons[1]->type:root->sons[0]->type);
-				}
-				if (root->type == ASTN_HEADER) root->symbol->data_type = getDataTypeByNodeType(root->sons[0]->type);
+				root->symbol->usage_type = getUsageType(root->type);
+				root->symbol->data_type = getDataTypeByNodeType(root->sons[root->sons[1]?1:0]->type);
 			}
-			if (root->type == ASTN_HEADER && root->sons[1])
-			{
-				if (root->sons[1]->type == ASTN_LIST_ARG)
-					createParamList(root,root->sons[1]->sons[0], getDataTypeByNodeType(root->sons[1]->sons[1]->type));
-				else 
-				{
-					CALL_LIST * item = malloc(sizeof(CALL_LIST));
-					item->dataType = getDataTypeByNodeType(root->sons[1]->sons[0]->type);
-					root->symbol->list = item;
-				}		
-			}	
-		}	
+		}
+
+	
+
 		// vvvvvv top-down 
 		//=============================================================================
 		for (i=0;i<4;++i)
@@ -252,90 +251,89 @@ void check_declarations_and_usage(ASTREE * root)
 		//=============================================================================
 		// ^^^^^^ botton-up
 
-		if ((root->type == ASTN_SYMBOL_VAR || root->type == ASTN_INPUT) && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED) 
-			printf("Simbolo %s não declarado. \n", root->symbol->value);
-		else 
-			if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
-				printf("Simbolo %s usado como variável, mas declarado como %s \n", root->symbol->value, get_usage_type_name(root->symbol->usage_type));
-		else 
-			if (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) 
-				printf("Simbolo %s usado como variável, mas declarado como %s \n", root->symbol->value, get_usage_type_name(root->symbol->usage_type));
-		else 
-			if (root->type == ASTN_SYMBOL_VEC && getExpressionType(root->sons[0]) != HASH_DATA_TYPE_INT)  
-				printf("Índices de vetores devem ser inteiros %s \n", root->symbol->value);
-		else
-			if (root->type == ASTN_EXP_OP)
-			{
-				int type1 = getExpressionType(root->sons[0]);
-				int type2 = getExpressionType(root->sons[2]);
-				if (!isOperationDefined(type1,root->sons[1]->type) || type1 != type2 )
-				 	printf("Operação não suportada para os tipos destes operadores %d e %d\n", type1,type2); 
-			}
-		else
-			if (root->type == ASTN_FUNCALL) 
-			{
-				if ((root->sons[0] && !root->symbol->list) || (!root->sons[0] && root->symbol->list)) 
-				{	
-					printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);				 
-				}
-				else if (root->type == ASTN_FUNCALL & !isCallCompatible(root->symbol->list,root->sons[0]))
-				 	printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
-			}
+		//ASSOCIA A CADA SYMBOLO DO TIPO FUNCAO A SUA LISTA DE SYMBOLOS PARAMETROS
+		if (root->type == ASTN_HEADER ) createParamList(root,root->sons[1]);	
+
+		fetchTypeFromSons(root);
+
+		if (root->symbol && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED && root->symbol->type == SYMBOL_IDENTIFIER)
+			printf("Simbolo %s não declarado na linha %i. \n", 
+				root->symbol->value,
+				root->lineNumber);
+
+		if (isUsageNotComaptible(root)) 
+			printf("Simbolo %s usado como %s, mas declarado como %s na linha %i\n", 
+				root->symbol->value, 
+				selecionaMensagemPorTipo(root->type),
+				get_usage_type_name(root->symbol->usage_type),root->lineNumber);
+
+		if (root->type == ASTN_SYMBOL_VEC && root->sons[0]->data_type != HASH_DATA_TYPE_INT)
+				printf("Índices de vetores não inteiro na linha %i \n", root->lineNumber);
+
+
+		if (root->type == ASTN_EXP_OP && (
+			root->sons[0]->data_type == HASH_DATA_TYPE_UNDEFINED || root->sons[2]->data_type == HASH_DATA_TYPE_UNDEFINED
+			|| isOperationNotDefined(root->sons[0]->data_type,root->sons[1]->type) 
+			|| root->sons[0]->data_type != root->sons[2]->data_type))
+			
+			printf("Operação não suportada para os tipos destes operadores %d e %d\n",
+				root->sons[0]->data_type,
+				root->sons[2]->data_type);
+			
+
+		if (root->type == ASTN_FUNCALL && isCallNotCompatible(root->sons[0],root->symbol->list))
+			printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
+		
+		if (root->type == ASTN_ASSIGNMENT)
+		{
+			//  	printf("Tipos diferentes na atribuicao %s\n", root->sons[0]->symbol->value);
+		}
 	}
 }
 
-
-int isCallCompatible(CALL_LIST* list,ASTREE* item) 
+void fetchTypeFromSons(ASTREE* node)
 {
-	if (isSymbolicItem(item->type))
+	switch (node->type)
 	{
-		if (item->sons[1])
-			return  list && item->sons[1]->symbol->data_type == list->dataType &&
-					   isCallCompatible(list->next, item->sons[0]);
-		else	
-			return list && getDataTypeByNodeType( item->type) == list->dataType;  
-	}
-	else
-	{
-		return isCallCompatible(list, item->sons[0]);
+		case ASTN_EXP_OP: case ASTN_SYMBOL_VEC:
+			node->data_type = node->sons[0]->data_type;
+			break;
+		case ASTN_ASSIGNMENT:
+			node->data_type = node->sons[1]->data_type;
+			break;
 	}
 }
-int isSymbolicItem(int type)
+
+int isUsageNotComaptible(ASTREE* root)
 {
-	switch (type)
-	{
-		case ASTN_EXP_OP:
-			return 0;
-		default:
-			return 1;
-	}
-
+	return (root->type == ASTN_SYMBOL_VAR && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VARIABLE) || 
+	(root->type == ASTN_SYMBOL_VEC && root->symbol->usage_type != SYMBOL_USAGE_TYPE_VECTOR) ||
+	(root->type == ASTN_FUNCALL && root->symbol->usage_type != SYMBOL_USAGE_TYPE_FUNCTION);
 }
 
-int createParamList(ASTREE * node, ASTREE* son, int dataType)
+int isCallNotCompatible(ASTREE* node, CALL_LIST* list) 
+{
+	if (list == NULL && node == NULL) return 0;
+	if (list && node == NULL) return 1;
+	if (list == NULL && node) return 1;
+	if (node->sons[0] == NULL) return node->data_type == list->data_type;
+	if (list->data_type != node->sons[1]->data_type) return 1;
+	return (list->data_type == node->sons[1]->data_type) && isCallNotCompatible(node->sons[0],list->next);
+}
+
+
+void createParamList(ASTREE * node, ASTREE * son)
 {
 	if (son)
 	{
-		if (son->sons[0])
-			  createParamList(
-		      node,
-			  son->sons[0],
-			  son->sons[1]?getDataTypeByNodeType(son->sons[1]->type):getDataTypeByNodeType(son->sons[0]->type));
 		CALL_LIST * item = malloc(sizeof(CALL_LIST));
-		item->dataType = dataType;	
+		item->data_type = son->sons[(son->sons[1])? 1 : 0]->data_type;
 		item->next = node->symbol->list;
 		node->symbol->list = item;
-
+		if (son->sons[1])
+			createParamList(node,son->sons[0]);
 	}
-}
 
-
-int getExpressionType(ASTREE* node) 
-{
-	if (node->symbol)
-		return node->symbol->data_type;
-	else if (node->type == ASTN_EXP_OP || node->type == ASTN_EXP)
-		return getExpressionType(node->sons[0]);
 }
 
 int getDataTypeByNodeType(int nodeType) 
@@ -357,24 +355,16 @@ int getDataTypeByNodeType(int nodeType)
 	}
 }
 
-const char * getNodeString(int tipo) 
-{
-	switch (tipo) {
-		default:
-		return "????";
-	}
-}
-
-int isOperationDefined(int dataType, int nodeType) 
+int isOperationNotDefined(int dataType, int nodeType) 
 {
 	switch (dataType)
 	{
 		case HASH_DATA_TYPE_INT: case HASH_DATA_TYPE_FLOAT:
-			return isOperationArithmetic(nodeType) || isOperationRelational(nodeType);
+			return !(isOperationArithmetic(nodeType) || isOperationRelational(nodeType));
 		case HASH_DATA_TYPE_BOOL:
-			return isOperationLogical(nodeType);
+			return !isOperationLogical(nodeType);
 		case HASH_DATA_TYPE_CHAR: case HASH_DATA_TYPE_STRING:
-			return 0;
+			return 1;
 	}
 }
 
@@ -396,8 +386,5 @@ int isOperationRelational(int nodeType)
 
 int isDeclarationType(int type)
 {
-	return (type  == ASTN_VAD) || (type == ASTN_VED) || (type == ASTN_HEADER);
+	return (type  == ASTN_VAD) || (type == ASTN_VED) || (type == ASTN_HEADER) ;
 }
-
-
-

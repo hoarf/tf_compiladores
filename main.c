@@ -2,15 +2,47 @@
 
 int main(int argc, char **argv) {
 
-	printf("Compiling %s...\n",argv[1]);
+	int i;
 	if (argc >= 2) {
 		initMe();
-	    yyin= fopen(argv[1],"r");
-#if YYDEBUG
-	    yydebug = 1;
-#endif
-	    yyparse();
-	    printf("%s","Success! \n");
+
+		display_symbol = 0;
+		display_tac = 0;
+		display_ast = 0;
+
+		for (i = 0; i < argc; ++i)
+		{
+			if (argv[i][0] == '-' && argv[i][1])
+			{
+				switch (argv[i][1])
+				{
+					case 's':
+						display_symbol = 1;
+						break;
+					case 'a':
+						display_ast = 1;
+						break;
+					case 't':
+						display_tac = 1;
+						break;
+				}
+			}
+		}
+
+
+
+		if (argv[1])
+		{
+
+		    yyin= fopen(argv[1],"r");
+			printf("Compiling %s...\n",argv[1]);
+	#if YYDEBUG
+		    yydebug = 1;
+	#endif
+		    yyparse();
+
+		}
+	    printf("%s","Build Finished! \n");
 	    exit(0);
 
 	}

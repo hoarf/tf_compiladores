@@ -9,6 +9,7 @@
 int yylex(void);
 int yyerror(char *);
 
+
 %}
 
 %union 
@@ -76,14 +77,15 @@ int yyerror(char *);
 
 program:
 	high_lvl_statements 					{ 
-												astree_exibe($$,0);
 												astree_check_semantics($$);
-											}	
+												if (display_ast) astree_exibe($$,0);
+												if (display_tac) tac_print(genco($$));
+											}
 	| 										{ $$ = 0 ;}
 	;
 
 high_lvl_statements:
-	high_lvl_statements high_lvl_statement 	{ $$ = astree_create(ASTN_LIST, NULL, $1, $2, NULL, NULL);}
+	high_lvl_statements high_lvl_statement 	{ $$ = astree_create(ASTN_STATEMENT_LIST, NULL, $1, $2, NULL, NULL);}
 	| high_lvl_statement 
 	;
 
@@ -121,7 +123,7 @@ cabecalho:
 
 lista_de_parametros:					
 	lista_de_parametros ',' TK_IDENTIFIER ':' tipo 
-											{ $$ = astree_create(ASTN_LIST_ARG, $3, $1 , $5 , NULL, NULL); }
+											{ $$ = astree_create(ASTN_VAD, $3, $1 , $5 , NULL, NULL); }
 	| TK_IDENTIFIER ':' tipo 				{ $$ = astree_create_basic(ASTN_VAD, $1, $3); }
 	| 										{ $$ = 0; }
 	;
@@ -160,8 +162,8 @@ comando:
 	;
 
 esquerda:					
-	TK_IDENTIFIER							{ $$ =  astree_create_symbol(ASTN_SYMBOL, $1); }
-	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_,$1, $3); }
+	TK_IDENTIFIER							{ $$ =  astree_create_symbol(ASTN_SYMBOL_VAR, $1); }
+	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_SYMBOL_VEC,$1, $3); }
 	;
 
 lista_de_elementos:	
@@ -170,7 +172,7 @@ lista_de_elementos:
 	;
 
 elemento:					
-	LIT_STRING 								{ $$ = astree_create_symbol(ASTN_SYMBOL, $1); }
+	LIT_STRING 								{ $$ = astree_create_symbol(ASTN_SV, $1); }
 	| expressao 
 	;
 
@@ -187,8 +189,8 @@ expressao:
 	| TK_IDENTIFIER '[' expressao ']' 		{ $$ = astree_create_basic(ASTN_SYMBOL_VEC, $1,$3); }
 	| LIT_INTEGER 							{ $$ = astree_create_symbol(ASTN_IV, $1); }
 	| LIT_FLOA 								{ $$ = astree_create_symbol(ASTN_FV, $1); }
-	| LIT_TRUE 								{ $$ = astree_create_symbol(ASTN_BV, $1); }
-	| LIT_FALSE 							{ $$ = astree_create_symbol(ASTN_BV, $1); }
+	| LIT_TRUE 								{ $$ = astree_create_symbol(ASTN_BV, fixedSymbol(SYMBOL_LIT_TRUE)); }
+	| LIT_FALSE 							{ $$ = astree_create_symbol(ASTN_BV, fixedSymbol(SYMBOL_LIT_FALSE)); }
 	| LIT_CHAR 								{ $$ = astree_create_symbol(ASTN_CV, $1); }
 	| LIT_STRING 							{ $$ = astree_create_symbol(ASTN_SV, $1); }
 	|										{ $$ = 0 ;}

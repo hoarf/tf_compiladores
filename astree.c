@@ -280,14 +280,12 @@ void check_declarations_and_usage(ASTREE * root)
 				root->sons[0]->data_type,
 				root->sons[2]->data_type);
 			
-
 		if (root->type == ASTN_FUNCALL && isCallNotCompatible(root->sons[0],root->symbol->list))
 			printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
 		
-		if (root->type == ASTN_ASSIGNMENT)
-		{
-			//  	printf("Tipos diferentes na atribuicao %s\n", root->sons[0]->symbol->value);
-		}
+		if (root->type == ASTN_ASSIGNMENT && root->data_type != root->sons[0]->symbol->data_type)
+			printf("Tipos diferentes na atribuicao %s na linha %i\n", root->sons[0]->symbol->value,root->sons[0]->lineNumber);
+		
 	}
 }
 

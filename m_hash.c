@@ -1,7 +1,10 @@
 #include "m_hash.h"
 
+//PROTOTIPOS
+
 int printList(CALL_LIST* list);
 
+//
 
 HASH_NODE * fixedSymbol(int type)
 {
@@ -69,7 +72,7 @@ void print(void)
 {
 	int i;
 	printf("======= Tabela Hash ========================================================\n");
-	printf("Posição		Conteúdo	Tipo		Tipo de Uso\n");
+	printf("Posição		Conteúdo	Tipo		Uso	Dado\n");
 	for (i = 0; i < HASH_SIZE; ++i) 
 	{
 		if (tabela[i] != NULL) 
@@ -77,7 +80,7 @@ void print(void)
 			HASH_NODE * node = tabela[i];
 			while (node != NULL) 
 			{
-				printf("%d\t\t%s\t\t%d\t\t%i\n",i, node->value,node->type, node->usage_type);
+				printf("%d\t\t%s\t\t%d\t\t%i\t%i\n",i, node->value,node->type, node->usage_type, node->data_type);
 				if (node->list){
 					printf("		|_>: ");
 					printList(node->list);

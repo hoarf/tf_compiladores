@@ -23,6 +23,8 @@ int isCallNotCompatible(ASTREE* node,CALL_LIST* list);
 void createParamList(ASTREE * node, ASTREE* son);
 int isSymbolicItem(int type);
 int getUsageType(int type);
+char * getDataypeName(int dataType);
+CALL_LIST* revertParamList(CALL_LIST* list);
 
 //End Private Prototypes
 
@@ -233,6 +235,7 @@ void check_declarations_and_usage(ASTREE * root)
 		//DEFINE O TIPO DE USO DE CADA SYMBOLO
 		if (root->symbol != NULL) 
 		{
+			// root->symbol->data_type = getDataTypeByNodeType(root->type);
 			if (root->symbol->usage_type != SYMBOL_USAGE_TYPE_UNUSED && isDeclarationType(root->type))
 				printf("Simbolo %s já declarado na linha %i\n", root->symbol->value, root->lineNumber);
 			else if (isDeclarationType(root->type))
@@ -252,8 +255,12 @@ void check_declarations_and_usage(ASTREE * root)
 		// ^^^^^^ botton-up
 
 		//ASSOCIA A CADA SYMBOLO DO TIPO FUNCAO A SUA LISTA DE SYMBOLOS PARAMETROS
-		if (root->type == ASTN_HEADER ) createParamList(root,root->sons[1]);	
-
+		if (root->type == ASTN_HEADER )
+		{
+			createParamList(root,root->sons[1]);	
+			root->symbol->list = revertParamList(root->symbol->list);
+		} 
+		 
 		fetchTypeFromSons(root);
 
 		if (root->symbol && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED && root->symbol->type == SYMBOL_IDENTIFIER)
@@ -273,26 +280,46 @@ void check_declarations_and_usage(ASTREE * root)
 
 		if (root->type == ASTN_EXP_OP && (
 			root->sons[0]->data_type == HASH_DATA_TYPE_UNDEFINED || root->sons[2]->data_type == HASH_DATA_TYPE_UNDEFINED
-			|| isOperationNotDefined(root->sons[0]->data_type,root->sons[1]->type) 
+			|| isOperationNotDefined(root->sons[0]->symbol->data_type,root->sons[1]->type) 
 			|| root->sons[0]->data_type != root->sons[2]->data_type))
 			
-			printf("Operação não suportada para os tipos destes operadores %d e %d\n",
-				root->sons[0]->data_type,
-				root->sons[2]->data_type);
+			printf("Operação não suportada para os tipos destes operadores %s e %s na linha %i\n",
+				getDataypeName(root->sons[0]->data_type),
+				getDataypeName(root->sons[2]->data_type),
+				root->lineNumber);
 			
 		if (root->type == ASTN_FUNCALL && isCallNotCompatible(root->sons[0],root->symbol->list))
-			printf("A lista de argumentos chamada não confere com a declarada em %s\n", root->symbol->value);
+			printf("A lista de argumentos chamada não confere com a declarada em %s na linha %i\n", root->symbol->value, root->lineNumber);
 		
-		if (root->type == ASTN_ASSIGNMENT && root->data_type != root->sons[0]->symbol->data_type)
+		if (root->type == ASTN_ASSIGNMENT && root->sons[1]->data_type != root->sons[0]->symbol->data_type)
 			printf("Tipos diferentes na atribuicao %s na linha %i\n", root->sons[0]->symbol->value,root->sons[0]->lineNumber);
 		
+		
 	}
+}
+
+CALL_LIST * revertParamList(CALL_LIST* list)
+{
+	CALL_LIST * new_list = NULL;
+
+	while (list)
+	{
+		CALL_LIST * head = list;
+		list = list->next;
+		head->next = new_list;
+		new_list = head;
+	}
+
+	return new_list;
 }
 
 void fetchTypeFromSons(ASTREE* node)
 {
 	switch (node->type)
 	{
+		case ASTN_SYMBOL_VAR:
+			node->data_type = node->symbol->data_type;
+			break;
 		case ASTN_EXP_OP: case ASTN_SYMBOL_VEC:
 			node->data_type = node->sons[0]->data_type;
 			break;
@@ -314,9 +341,8 @@ int isCallNotCompatible(ASTREE* node, CALL_LIST* list)
 	if (list == NULL && node == NULL) return 0;
 	if (list && node == NULL) return 1;
 	if (list == NULL && node) return 1;
-	if (node->sons[0] == NULL) return node->data_type == list->data_type;
-	if (list->data_type != node->sons[1]->data_type) return 1;
-	return (list->data_type == node->sons[1]->data_type) && isCallNotCompatible(node->sons[0],list->next);
+	if (node->sons[0] == NULL) return node->data_type != list->data_type;
+	return (list->data_type != node->sons[1]->data_type) || isCallNotCompatible(node->sons[0],list->next);
 }
 
 
@@ -333,6 +359,26 @@ void createParamList(ASTREE * node, ASTREE * son)
 	}
 
 }
+
+char * getDataypeName(int dataType)
+{
+	switch (dataType)
+	{
+		case HASH_DATA_TYPE_STRING:
+			return "string";
+		case HASH_DATA_TYPE_INT:
+			return "inteiro";
+		case HASH_DATA_TYPE_FLOAT:
+			return "float";
+		case HASH_DATA_TYPE_BOOL:
+			return "bool";
+		case HASH_DATA_TYPE_CHAR:
+			return "char";
+		case HASH_DATA_TYPE_UNDEFINED:
+			return "indefinido";
+	}
+}
+
 
 int getDataTypeByNodeType(int nodeType) 
 {

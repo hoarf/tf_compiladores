@@ -98,6 +98,7 @@ HASH_NODE * makeTmp(void)
 	static int nextTmp = 0; 
 	static char buffer[32] = ""; 
 	sprintf(buffer,"_mY_nEw_Temp%d",nextTmp++);
+
 	return insertNode(buffer,SYMBOL_VARIABLE);
 }
 
@@ -107,4 +108,19 @@ HASH_NODE * makeLabel(void)
 	static char bufferlbl[32] = ""; 
 	sprintf(bufferlbl,"_mY_nEw_Label%d",nextLabel++);
 	return insertNode(bufferlbl,SYMBOL_LABEL);
+}
+
+int getTypeSize(HASH_NODE* symbol)
+{
+	switch (symbol->data_type)
+	{
+		case HASH_DATA_TYPE_UNDEFINED:
+			return -1;
+		case HASH_DATA_TYPE_FLOAT: case HASH_DATA_TYPE_INT: case HASH_DATA_TYPE_BOOL: 
+			return 4;
+		case HASH_DATA_TYPE_CHAR:
+			return 1;	
+		case HASH_DATA_TYPE_STRING:
+			return strlen(symbol->value);
+	}
 }

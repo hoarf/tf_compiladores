@@ -56,14 +56,17 @@ HASH_NODE * fixedSymbol(int type);
 
 HASH_NODE* makeTmp(void);
 HASH_NODE* tabela[HASH_SIZE];
-HASH_NODE * insertNode(const char* value, int type);
+HASH_NODE* insertNode(const char* value, int type);
 HASH_NODE* makeLabel(void);
 
 
 int display_ast;
 int display_tac;
 int display_symbol;
+int display_file;
+int numberOfErrors;
 
+int getTypeSize(HASH_NODE* symbol);
 
 
 #endif /* M_HASH_H_ */

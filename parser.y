@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "astree.h"
+#include "machine_code_gen.h"
 #include "scanner.h"
 #define YYDEBUG 1
 
@@ -79,7 +80,13 @@ program:
 	high_lvl_statements 					{ 
 												astree_check_semantics($$);
 												if (display_ast) astree_exibe($$,0);
-												if (display_tac) tac_print(genco($$));
+												TAC* tac = genco($$);
+												if (display_tac) tac_print(tac);
+												if (numberOfErrors == 0)
+												{
+												   printf("Gerando arquivo de de saída: %s\n","output.s");
+												   generate_machine_code("output.s",tac);
+												}  
 											}
 	| 										{ $$ = 0 ;}
 	;

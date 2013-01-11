@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 		display_symbol = 0;
 		display_tac = 0;
 		display_ast = 0;
+		display_file = 0;
 
 		for (i = 0; i < argc; ++i)
 		{
@@ -24,6 +25,9 @@ int main(int argc, char **argv) {
 						break;
 					case 't':
 						display_tac = 1;
+						break;
+					case 'f':
+						display_file =1;
 						break;
 				}
 			}
@@ -42,7 +46,7 @@ int main(int argc, char **argv) {
 		    yyparse();
 
 		}
-	    printf("%s","Build Finished! \n");
+	    printf("%s%i%s","Build Finished! ",numberOfErrors," erro(s).\n");
 	    exit(0);
 
 	}

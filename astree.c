@@ -26,6 +26,7 @@ int getUsageType(int type);
 char * getDataypeName(int dataType);
 CALL_LIST* revertParamList(CALL_LIST* list);
 
+
 //End Private Prototypes
 
 ASTREE * astree_create(int type, HASH_NODE* symbol,ASTREE* son1, ASTREE* son2, ASTREE* son3, ASTREE* son4) 
@@ -204,6 +205,7 @@ char* get_usage_type_name(int t)
 
 
 void astree_check_semantics(ASTREE * tree) {
+	numberOfErrors = 0;
 	check_declarations_and_usage(tree);
 	if (display_symbol) print();
 }
@@ -237,16 +239,16 @@ void check_declarations_and_usage(ASTREE * root)
 		{
 			// root->symbol->data_type = getDataTypeByNodeType(root->type);
 			if (root->symbol->usage_type != SYMBOL_USAGE_TYPE_UNUSED && isDeclarationType(root->type))
+			{
+				numberOfErrors++;
 				printf("Simbolo %s já declarado na linha %i\n", root->symbol->value, root->lineNumber);
+			}
 			else if (isDeclarationType(root->type))
 			{
 				root->symbol->usage_type = getUsageType(root->type);
 				root->symbol->data_type = getDataTypeByNodeType(root->sons[root->sons[1]?1:0]->type);
 			}
 		}
-
-	
-
 		// vvvvvv top-down 
 		//=============================================================================
 		for (i=0;i<4;++i)
@@ -264,37 +266,51 @@ void check_declarations_and_usage(ASTREE * root)
 		fetchTypeFromSons(root);
 
 		if (root->symbol && root->symbol->usage_type == SYMBOL_USAGE_TYPE_UNUSED && root->symbol->type == SYMBOL_IDENTIFIER)
+		{
+			numberOfErrors++;
 			printf("Simbolo %s não declarado na linha %i. \n", 
 				root->symbol->value,
 				root->lineNumber);
+		}
 
-		if (isUsageNotComaptible(root)) 
+		if (isUsageNotComaptible(root))
+		{
+			numberOfErrors++;			
 			printf("Simbolo %s usado como %s, mas declarado como %s na linha %i\n", 
 				root->symbol->value, 
 				selecionaMensagemPorTipo(root->type),
 				get_usage_type_name(root->symbol->usage_type),root->lineNumber);
+		} 
 
 		if (root->type == ASTN_SYMBOL_VEC && root->sons[0]->data_type != HASH_DATA_TYPE_INT)
-				printf("Índices de vetores não inteiro na linha %i \n", root->lineNumber);
+		{
+			numberOfErrors++;
+			printf("Índices de vetores não inteiro na linha %i \n", root->lineNumber);
+		}
 
 
 		if (root->type == ASTN_EXP_OP && (
 			root->sons[0]->data_type == HASH_DATA_TYPE_UNDEFINED || root->sons[2]->data_type == HASH_DATA_TYPE_UNDEFINED
-			|| isOperationNotDefined(root->sons[0]->symbol->data_type,root->sons[1]->type) 
+			|| isOperationNotDefined(root->sons[0]->data_type,root->sons[1]->type) 
 			|| root->sons[0]->data_type != root->sons[2]->data_type))
-			
+		{
+			numberOfErrors++;
 			printf("Operação não suportada para os tipos destes operadores %s e %s na linha %i\n",
 				getDataypeName(root->sons[0]->data_type),
 				getDataypeName(root->sons[2]->data_type),
 				root->lineNumber);
-			
+		}	
 		if (root->type == ASTN_FUNCALL && isCallNotCompatible(root->sons[0],root->symbol->list))
-			printf("A lista de argumentos chamada não confere com a declarada em %s na linha %i\n", root->symbol->value, root->lineNumber);
+			{
+				numberOfErrors++;
+				printf("A lista de argumentos chamada não confere com a declarada em %s na linha %i\n", root->symbol->value, root->lineNumber);
+			}
 		
 		if (root->type == ASTN_ASSIGNMENT && root->sons[1]->data_type != root->sons[0]->symbol->data_type)
+		{
+			numberOfErrors++;
 			printf("Tipos diferentes na atribuicao %s na linha %i\n", root->sons[0]->symbol->value,root->sons[0]->lineNumber);
-		
-		
+		}		
 	}
 }
 
@@ -357,7 +373,6 @@ void createParamList(ASTREE * node, ASTREE * son)
 		if (son->sons[1])
 			createParamList(node,son->sons[0]);
 	}
-
 }
 
 char * getDataypeName(int dataType)

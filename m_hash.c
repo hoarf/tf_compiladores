@@ -97,7 +97,7 @@ HASH_NODE * makeTmp(void)
 {
 	static int nextTmp = 0; 
 	static char buffer[32] = ""; 
-	sprintf(buffer,"_mY_nEw_Temp%d",nextTmp++);
+	sprintf(buffer,"t%d",nextTmp++);
 
 	return insertNode(buffer,SYMBOL_VARIABLE);
 }
@@ -106,7 +106,7 @@ HASH_NODE * makeLabel(void)
 {
 	static int nextLabel = 0; 
 	static char bufferlbl[32] = ""; 
-	sprintf(bufferlbl,"_mY_nEw_Label%d",nextLabel++);
+	sprintf(bufferlbl,"L%d",nextLabel++);
 	return insertNode(bufferlbl,SYMBOL_LABEL);
 }
 

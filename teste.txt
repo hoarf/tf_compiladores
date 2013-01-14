@@ -9,11 +9,11 @@ main: int( p_1:int, p_2: char, p_3: bool)
 	l_1 = 10 + 2 + 34 + 212;
 	return main(1,'d',false);
     l_1 = p_1;
-	while (true) return g_1[l_1];
+//	while (true) return g_1[l_1];
 	return l_1 + l_1;
 	output "ok" ,2+10 , 1;
-	if (p_1 == 1) then return true else return false; 
-	if (main(2,'c',true)) then input l_2 else input l_3;
+//	if (p_1 == 1) then return true else return false; 
+//	if (main(2,'c',true)) then input l_2 else input l_3;
 	input g_2; 
 };
 foo: int()

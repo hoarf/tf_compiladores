@@ -17,7 +17,7 @@ y.tab.o: y.tab.c
 	gcc -c y.tab.c
 	
 y.tab.c: parser.y
-	yacc -dv parser.y
+	yacc -dv --verbose parser.y
 
 lex.yy.c: scanner.l y.tab.c
 	flex --header-file=lex.yy.h scanner.l

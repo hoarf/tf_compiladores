@@ -28,13 +28,13 @@ output				{ return KW_OUTPUT; }
 "&&"				{ return OPERATOR_AND; }
 "||"				{ return OPERATOR_OR; }
 
-false	 			{ return LIT_FALSE; }
-true 				{ return LIT_TRUE; }
+false	 			{yylval.symbol=insertNode("false",SYMBOL_LIT_FALSE) ; return LIT_FALSE; }
+true 				{yylval.symbol=insertNode("true",SYMBOL_LIT_TRUE) ; return LIT_TRUE; }
 
 L?\"(\\.|[^\\"])*\"		{ trimQuotes(yytext) ; yylval.symbol=insertNode(yytext,SYMBOL_LIT_STRING) ; return LIT_STRING; }
-[a-zA-Z][_a-zA-Z0-9]* 	{ yylval.symbol=insertNode(yytext,SYMBOL_IDENTIFIER) ; return TK_IDENTIFIER; }
-[-]?[0-9]*"."[0-9]+ 	{ yylval.symbol=insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
-[-]?[0-9]+ 				{ yylval.symbol=insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
+[a-zA-Z][_a-zA-Z0-9]* 	{ yylval.symbol=insertNode(yytext,SYMBOL_IDENTIFIER) ; return ID; }
+[0-9]*"."[0-9]+ 	{ yylval.symbol=insertNode(yytext,SYMBOL_LIT_FLOATING) ; return LIT_FLOA; }
+[0-9]+ 				{ yylval.symbol=insertNode(yytext,SYMBOL_LIT_INTEGER) ; return LIT_INTEGER; }
 "'"[a-zA-Z]"'" 			{ char valorChar = yytext[1] ;yylval.symbol = insertNode(&valorChar,SYMBOL_LIT_CHAR) ; return LIT_CHAR; }
 
 [ \t]				{}

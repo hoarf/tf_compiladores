@@ -75,7 +75,7 @@ int yyerror(char *);
 
 program:
 	hl_statements 							{ 
-												//astree_check_semantics($$);
+												astree_check_semantics($$);
 												if (display_ast) astree_exibe($$,0);
 												
 												if (display_tac)  
